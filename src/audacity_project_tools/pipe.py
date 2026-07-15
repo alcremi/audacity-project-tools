@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TextIO
 
 from .exceptions import PipeConnectionError
 
@@ -16,9 +17,13 @@ class AudacityPipe:
         self._to_pipe = to_pipe
         self._from_pipe = from_pipe
 
+        self._writer: TextIO | None = None
+        self._reader: TextIO | None = None
+
     def connect(self) -> None:
-        """Open communication channels with Audacity."""
-        raise NotImplementedError
+        """Open the communication pipes to Audacity."""
+        self._writer = self._to_pipe.open("w")
+        self._reader = self._from_pipe.open("r")
 
     def send(self, command: str) -> str:
         """Send a command and return Audacity response."""
@@ -26,4 +31,24 @@ class AudacityPipe:
 
     def close(self) -> None:
         """Close communication channels."""
-        raise NotImplementedError
+
+        if self._writer is not None:
+            self._writer.close()
+            self._writer = None
+
+        if self._reader is not None:
+            self._reader.close()
+            self._reader = None
+
+    def __enter__(self) -> "AudacityPipe":
+        self.connect()
+        return self
+
+
+    def __exit__(
+        self,
+        exc_type,
+        exc,
+        tb,
+    ) -> None:
+        self.close()

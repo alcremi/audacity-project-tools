@@ -2,22 +2,16 @@
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
+
 [project]
 name = "audacity-project-tools"
 version = "0.1.0"
-description = "Reliable automation and migration tools for Audacity projects."
-requires-python = ">=3.11"
-license = {text = "MIT"}
-
+description = "Tools for migrating and managing Audacity projects"
+requires-python = ">=3.13"
 authors = [
-    {name = "Audacity Project Tools contributors"}
+    {name = "Alcremi"}
 ]
 
-dependencies = [
-]
 
-[project.optional-dependencies]
-dev = [
-    "pytest",
-    "ruff",
-]
+[tool.setuptools.packages.find]
+where = ["src"]

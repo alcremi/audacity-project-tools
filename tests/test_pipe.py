@@ -12,3 +12,5 @@ def test_pipe_creation() -> None:
     assert pipe is not None
     assert pipe._reader is None
     assert pipe._writer is None
+
+    # response = pipe.send(command)

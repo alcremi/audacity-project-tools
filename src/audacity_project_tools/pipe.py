@@ -6,6 +6,9 @@ from typing import TextIO
 from .exceptions import PipeConnectionError
 
 
+# _RESPONSE_END = "BatchCommand finished:"
+# if line.startswith(_RESPONSE_END):
+
 class AudacityPipe:
     """Low-level communication with Audacity through mod-script-pipe."""
 
@@ -27,7 +30,28 @@ class AudacityPipe:
 
     def send(self, command: str) -> str:
         """Send a command and return Audacity response."""
-        raise NotImplementedError
+
+        if self._writer is None or self._reader is None:
+            raise PipeConnectionError("Pipe is not connected.")
+
+        self._writer.write(command)
+        self._writer.write("\n")
+        self._writer.flush()
+
+        lines: list[str] = []
+
+        while True:
+            line = self._reader.readline()
+
+            if not line:
+                break
+
+            lines.append(line)
+
+            if line.startswith("BatchCommand finished:"):
+                break
+
+        return "".join(lines)
 
     def close(self) -> None:
         """Close communication channels."""

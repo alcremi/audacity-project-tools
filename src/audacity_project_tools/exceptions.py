@@ -8,3 +8,6 @@ class PipeConnectionError(AudacityError):
 
 class CommandError(AudacityError):
     """Raised when Audacity rejects a command."""
+
+class AudacityCommandError(Exception):
+    """Raised when Audacity reports a command failure."""

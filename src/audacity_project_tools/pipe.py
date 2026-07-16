@@ -76,3 +76,37 @@ class AudacityPipe:
         tb,
     ) -> None:
         self.close()
+
+"""
+class FakePipe:
+    def __init__(self) -> None:
+        self.command = ""
+
+    def send(self, command: str) -> str:
+        self.command = command
+        return "BatchCommand finished: OK"
+"""
+
+class FakePipe:
+    def __init__(self) -> None:
+        self.command = "Help:"
+
+    def _sendHelp(self, command: str) -> str:
+        self.command = command
+        return "BatchCommand finished: OK"
+
+    def send(self, command: str) -> str:
+        if str == "Help:":
+            self.command = "Help:"
+            return self._sendHelp(command)
+
+        return """
+[
+  {
+    "name": "Voice",
+    "start": 0,
+    "end": 12.5,
+    "channels": 1
+  }
+]
+"""

@@ -1,7 +1,8 @@
 
 from .pipe import AudacityPipe
 from .exceptions import AudacityCommandError
-
+from .models import Track
+from .parsers import parse_tracks
 
 class AudacityClient:
     """High-level interface to Audacity scripting commands."""
@@ -22,18 +23,6 @@ class AudacityClient:
 
         return self._execute("Help:")
 
-    def get_tracks(self) -> str:
-        return self._execute("GetInfo: Type=Tracks")
-
-    # open_project(...)
-
-    # save_project(...)
-
-
-class FakePipe:
-    def __init__(self) -> None:
-        self.command = ""
-
-    def send(self, command: str) -> str:
-        self.command = command
-        return "BatchCommand finished: OK"
+    def get_tracks(self) -> list[Track]:
+        response = self._execute("GetInfo: Type=Tracks")
+        return parse_tracks(response)

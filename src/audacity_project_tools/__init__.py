@@ -3,6 +3,7 @@ from .client import FakePipe
 from .exceptions import AudacityCommandError
 from .exceptions import PipeConnectionError
 from .pipe import AudacityPipe
+from .models import Track
 
 __all__ = [
     "AudacityClient",
@@ -10,4 +11,5 @@ __all__ = [
     "AudacityPipe",
     "PipeConnectionError",
     "FakePipe",
+    "Track",
 ]

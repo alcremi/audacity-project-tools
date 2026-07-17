@@ -29,6 +29,10 @@ class AudacityClient:
         return parse_tracks(response)
 
 
-    def open_project(self, project: Path) -> None:
-        command = f'OpenProject2: Filename="{project}"'
+    def open_project(self, project_path: Path) -> None:
+        command = f'OpenProject2: Filename="{project_path}"'
+        self._execute(command)
+
+    def save_project(self, project_path: Path) -> None:
+        command = f'SaveProject2: Filename="{project_path}"'
         self._execute(command)

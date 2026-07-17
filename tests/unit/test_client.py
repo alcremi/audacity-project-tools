@@ -47,7 +47,6 @@ class FakePipe2:
 ]
 """
 
-
 def test_get_tracks_command() -> None:
     pipe = FakePipe2()
     client = AudacityClient(pipe)
@@ -56,3 +55,23 @@ def test_get_tracks_command() -> None:
 
     assert pipe.command == "GetInfo: Type=Tracks"
     assert len(tracks) == 1
+
+
+class FakePipe3:
+    def __init__(self) -> None:
+        self.command = ""
+        self.commands = []
+
+    def send(self, command: str) -> str:
+        self.command = command
+        self.commands.append(command)
+        return "BatchCommand finished: OK"
+
+def test_open_project() -> None:
+
+    pipe = FakePipe3()
+    client = AudacityClient(pipe)
+
+    client.open_project(Path("/tmp/test.aup"))
+
+    assert pipe.command == 'OpenProject2: Filename="/tmp/test.aup"'

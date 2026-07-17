@@ -1,3 +1,4 @@
+from pathlib import Path
 
 from .pipe import AudacityPipe
 from .exceptions import AudacityCommandError
@@ -26,3 +27,8 @@ class AudacityClient:
     def get_tracks(self) -> list[Track]:
         response = self._execute("GetInfo: Type=Tracks")
         return parse_tracks(response)
+
+
+    def open_project(self, project: Path) -> None:
+        command = f'OpenProject2: Filename="{project}"'
+        self._execute(command)

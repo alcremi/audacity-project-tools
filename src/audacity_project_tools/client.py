@@ -36,3 +36,7 @@ class AudacityClient:
     def save_project(self, project_path: Path) -> None:
         command = f'SaveProject2: Filename="{project_path}"'
         self._execute(command)
+
+    def exit_project(self) -> None:
+        command = f'Exit:"'
+        self._execute(command)

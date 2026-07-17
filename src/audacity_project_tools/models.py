@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -18,3 +18,4 @@ class Project:
     """An Audacity project."""
 
     path: Path
+    tracks: list[Track] = field(default_factory=list)

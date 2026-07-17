@@ -65,7 +65,18 @@ class FakePipe3:
     def send(self, command: str) -> str:
         self.command = command
         self.commands.append(command)
-        return "BatchCommand finished: OK"
+        if command != "GetInfo: Type=Tracks":
+            return "BatchCommand finished: OK"
+        return """
+[
+    {
+        "name": "Voice",
+        "start": 0,
+        "end": 12.5,
+        "channels": 1
+    }
+]
+"""
 
 def test_open_project() -> None:
 
@@ -97,3 +108,14 @@ def test_exit_project() -> None:
     assert pipe.commands[-1] == (
         'Exit:"'
     )
+
+def test_load_project() -> None:
+
+    pipe = FakePipe3()
+    client = AudacityClient(pipe)
+
+    project = client.load_project(Path("/tmp/test.aup"))
+
+    assert project.path == Path("/tmp/test.aup")
+    assert len(project.tracks) == 1
+    assert project.tracks[0].name == "Voice"

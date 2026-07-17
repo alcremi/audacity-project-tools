@@ -2,7 +2,7 @@ from pathlib import Path
 
 from .pipe import AudacityPipe
 from .exceptions import AudacityCommandError
-from .models import Track
+from .models import Track, Project
 from .parsers import parse_tracks
 
 class AudacityClient:
@@ -40,3 +40,13 @@ class AudacityClient:
     def exit_project(self) -> None:
         command = f'Exit:"'
         self._execute(command)
+
+    def load_project(self, path: Path) -> Project:
+        self.open_project(path)
+
+        tracks = self.get_tracks()
+
+        return Project(
+            path=path,
+            tracks=tracks,
+        )

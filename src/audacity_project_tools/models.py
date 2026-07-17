@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(slots=True)
@@ -11,3 +12,9 @@ class Track:
     start: float
     end: float
     channels: int
+
+@dataclass(slots=True)
+class Project:
+    """An Audacity project."""
+
+    path: Path

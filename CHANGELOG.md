@@ -12,6 +12,7 @@
 0009  Add project opening
 0010  Add project saving
 0011  Add Audacity exit command
+0012  Add project model
 
 
 ### Added

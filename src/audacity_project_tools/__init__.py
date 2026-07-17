@@ -4,6 +4,7 @@ from .exceptions import PipeConnectionError
 from .pipe import AudacityPipe
 from .pipe import FakePipe
 from .models import Track
+from .models import Project
 
 __all__ = [
     "AudacityClient",
@@ -12,4 +13,5 @@ __all__ = [
     "PipeConnectionError",
     "FakePipe",
     "Track",
+    "Project",
 ]

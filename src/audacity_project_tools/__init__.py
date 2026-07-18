@@ -1,10 +1,8 @@
 from .client import AudacityClient
-from .exceptions import AudacityCommandError
-from .exceptions import PipeConnectionError
+from .exceptions import AudacityCommandError, PipeConnectionError
 from .pipe import AudacityPipe
 from .pipe import FakePipe, FakePipe3
-from .models import Track
-from .models import Project
+from .models import Track, Project
 from .converter import ProjectConverter
 from .scanner import ProjectScanner
 

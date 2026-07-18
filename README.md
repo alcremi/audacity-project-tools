@@ -1,37 +1,70 @@
 # audacity-project-tools
 
-Reliable automation and migration tools for Audacity projects.
+Convert legacy Audacity projects automatically.
 
-## Overview
+## Features
 
-audacity-project-tools is an open-source Python project dedicated to
-reliable automation of Audacity through its scripting interface.
+- Connect to Audacity through `mod-script-pipe`
+- Load legacy `.aup` projects
+- Save projects as modern `.aup3`
+- Scan directories recursively for Audacity projects
+- Convert multiple projects automatically
 
-The first application provided by this project is a migration tool for
-converting legacy Audacity `.aup` projects into the modern `.aup3`
-format.
+## Requirements
 
-The project focuses on:
+- Python 3.13 or newer
+- Audacity with the `mod-script-pipe` module enabled
 
-- reliability,
-- reproducibility,
-- maintainability,
-- documented technical decisions.
+## Installation
 
-## Motivation
+```bash
+git clone https://github.com/alcremi/audacity-project-tools.git
+cd audacity-project-tools
 
-Audacity legacy projects (`.aup` files with associated `_data`
-directories) cannot be directly used as modern `.aup3` projects.
+python -m venv .venv
+source .venv/bin/activate
 
-This project provides an automated and robust migration workflow
-based on Audacity's `mod-script-pipe` interface.
+pip install -e .
+```
 
-## Status
+## Example
 
-Early development.
+```python
+from pathlib import Path
 
-The project is currently being designed and implemented.
+from audacity_project_tools.connection import connect
+from audacity_project_tools import (
+    AudacityClient,
+    ProjectConverter,
+)
+
+pipe = connect()
+client = AudacityClient(pipe)
+
+converter = ProjectConverter(client)
+
+converter.convert(
+    Path("old.aup"),
+    Path("new.aup3"),
+)
+
+client.exit()
+```
+
+## Command line
+
+```bash
+python -m audacity_project_tools
+```
+
+(Command-line options will be extended in future releases.)
+
+## Project status
+
+This project is currently under active development.
+
+The public API is still evolving.
 
 ## License
 
-MIT License.
+MIT License

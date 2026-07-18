@@ -5,6 +5,7 @@ from .pipe import AudacityPipe
 from .pipe import FakePipe
 from .models import Track
 from .models import Project
+from .converter import ProjectConverter
 
 __all__ = [
     "AudacityClient",
@@ -14,4 +15,5 @@ __all__ = [
     "FakePipe",
     "Track",
     "Project",
+    "ProjectConverter",
 ]

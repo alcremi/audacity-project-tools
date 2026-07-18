@@ -19,12 +19,3 @@ class Project:
 
     path: Path
     tracks: list[Track] = field(default_factory=list)
-
-"""
-    def save(
-            self,
-            client: AudacityClient,
-            path: Path,
-    ) -> None:
-        client.save_project(path)
-"""

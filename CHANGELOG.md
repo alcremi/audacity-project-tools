@@ -19,6 +19,7 @@
 0016  Implement ProjectConverter.convert()
 0017  Create a main entry point
 0018  Add default pipe discovery
+0019  Add project scanner
 
 
 

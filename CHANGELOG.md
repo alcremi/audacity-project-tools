@@ -22,6 +22,7 @@
 0019  Add project scanner
 0020  Add a real processing in main (first part)
 0021  Extend README.md
+0022  Add GitHub Actions workflow
 
 
 

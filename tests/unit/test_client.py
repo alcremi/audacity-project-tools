@@ -2,6 +2,7 @@ from pathlib import Path
 
 from audacity_project_tools import AudacityPipe
 from audacity_project_tools import AudacityClient
+from audacity_project_tools import FakePipe3
 
 
 def test_client() -> None:
@@ -57,26 +58,6 @@ def test_get_tracks_command() -> None:
     assert len(tracks) == 1
 
 
-class FakePipe3:
-    def __init__(self) -> None:
-        self.command = ""
-        self.commands = []
-
-    def send(self, command: str) -> str:
-        self.command = command
-        self.commands.append(command)
-        if command != "GetInfo: Type=Tracks":
-            return "BatchCommand finished: OK"
-        return """
-[
-    {
-        "name": "Voice",
-        "start": 0,
-        "end": 12.5,
-        "channels": 1
-    }
-]
-"""
 
 def test_open_project() -> None:
 

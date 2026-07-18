@@ -77,15 +77,6 @@ class AudacityPipe:
     ) -> None:
         self.close()
 
-"""
-class FakePipe:
-    def __init__(self) -> None:
-        self.command = ""
-
-    def send(self, command: str) -> str:
-        self.command = command
-        return "BatchCommand finished: OK"
-"""
 
 class FakePipe:
     def __init__(self) -> None:
@@ -108,5 +99,33 @@ class FakePipe:
     "end": 12.5,
     "channels": 1
   }
+]
+"""
+
+class FakePipe3:
+    def __init__(self) -> None:
+        self.command = ""
+        self.commands: list[str] = []
+
+    def _sendHelp(self, command: str) -> str:
+        self.command = command
+        return "BatchCommand finished: OK"
+
+    def send(self, command: str) -> str:
+        self.command = command
+        self.commands.append(command)
+        if str == "Help:":
+            self.command = "Help:"
+            return self._sendHelp(command)
+        if command != "GetInfo: Type=Tracks":
+            return "BatchCommand finished: OK"
+        return """
+[
+    {
+        "name": "Voice",
+        "start": 0,
+        "end": 12.5,
+        "channels": 1
+    }
 ]
 """

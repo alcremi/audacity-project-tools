@@ -1,10 +1,11 @@
 import sys
-from pathlib import Path
+from pathlib     import Path
 
-from .client import AudacityClient
-from .converter import ProjectConverter
-from .scanner import ProjectScanner
+from .client     import AudacityClient
+from .converter  import ProjectConverter
+from .scanner    import ProjectScanner
 from .connection import connect
+from .cli        import parse_args
 
 
 def convert_directory(
@@ -19,7 +20,8 @@ def convert_directory(
         )
 
 def main() -> int:
-    root = Path(sys.argv[1])
+    args = parse_args()
+    root = args.directory
 
     pipe = connect()
     client = AudacityClient(pipe)

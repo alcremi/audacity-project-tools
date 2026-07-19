@@ -25,6 +25,7 @@
 0022  Add GitHub Actions workflow
 0023  Add argparse command-line interface
 0024  Add dry-run mode
+0025  Improve command-line output
 
 
 

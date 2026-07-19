@@ -59,7 +59,7 @@ def run() -> int:
 
     nb = convert_directory(root, converter, scanner, flagDryRun)
 
-    client.exit_project()
+    client.exit_audacity()
     print("Done.")
     return 0
 

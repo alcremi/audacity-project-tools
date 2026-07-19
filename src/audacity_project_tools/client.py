@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from .pipe import AudacityPipe
 from .exceptions import AudacityCommandError
-from .models import Track, Project
-from .parsers import parse_tracks
+from .models     import Track, Project
+from .parsers    import parse_tracks
+from .pipe       import AudacityPipe
 
 class AudacityClient:
     """High-level interface to Audacity scripting commands."""
@@ -12,6 +12,8 @@ class AudacityClient:
         self._pipe = pipe
 
     def _execute(self, command: str) -> str:
+        """Execute an Audacity command and return its response."""
+
         response = self._pipe.send(command)
 
         if "BatchCommand finished: Failed!" in response:
@@ -28,7 +30,6 @@ class AudacityClient:
         response = self._execute("GetInfo: Type=Tracks")
         return parse_tracks(response)
 
-
     def open_project(self, project_path: Path) -> None:
         command = f'OpenProject2: Filename="{project_path}"'
         self._execute(command)
@@ -37,9 +38,10 @@ class AudacityClient:
         command = f'SaveProject2: Filename="{project_path}"'
         self._execute(command)
 
-    def exit_project(self) -> None:
-        command = f'Exit:"'
-        self._execute(command)
+    def exit_audacity(self) -> None:
+        """Close the project (which must have been saved before) and close the Audacity instance."""
+
+        self._execute("Exit:")
 
     def load_project(self, path: Path) -> Project:
         self.open_project(path)

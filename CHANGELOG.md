@@ -27,6 +27,7 @@
 0024  Add dry-run mode
 0025  Improve command-line output
 0026  Handle command-line errors gracefully
+0027  Rename exit_project to exit_audacity
 
 
 

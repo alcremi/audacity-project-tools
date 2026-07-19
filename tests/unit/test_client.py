@@ -79,15 +79,15 @@ def test_save_project() -> None:
         'SaveProject2: Filename="/tmp/output.aup3"'
     )
 
-def test_exit_project() -> None:
+def test_exit_audacity() -> None:
 
     pipe = FakePipe3()
     client = AudacityClient(pipe)
 
-    client.exit_project()
+    client.exit_audacity()
 
     assert pipe.commands[-1] == (
-        'Exit:"'
+        'Exit:'
     )
 
 def test_load_project() -> None:

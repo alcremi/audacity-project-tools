@@ -12,23 +12,29 @@ def convert_directory(
         root: Path,
         converter: ProjectConverter,
         scanner: ProjectScanner,
+        flagDryRun: bool,
 ) -> None:
     for source in scanner.scan(root):
-        converter.convert(
-            source,
-            source.with_suffix(".aup3"),
-        )
+        destination = source.with_suffix(".aup3")
+
+        if flagDryRun:
+            print(f"{source} -> {destination}")
+            continue
+
+        converter.convert(source, destination)
+
 
 def main() -> int:
     args = parse_args()
     root = args.directory
+    flagDryRun = args.dry_run
 
     pipe = connect()
     client = AudacityClient(pipe)
     converter = ProjectConverter(client)
     scanner = ProjectScanner()
 
-    convert_directory(root, converter, scanner)
+    convert_directory(root, converter, scanner, flagDryRun)
 
     client.exit_project()
     return 0

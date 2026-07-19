@@ -21,4 +21,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
 
     # Optional arguments will be added here.
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Show planned conversions without modifying files.",
+    )
+
     return parser.parse_args(argv)

@@ -24,6 +24,7 @@
 0021  Extend README.md
 0022  Add GitHub Actions workflow
 0023  Add argparse command-line interface
+0024  Add dry-run mode
 
 
 

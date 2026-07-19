@@ -4,9 +4,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 
-@dataclass(slots=True)
+@dataclass(slots=True, frozen=True)
 class Track:
-    """Audio track information returned by Audacity."""
+    """A track in an Audacity project."""
 
     name: str
     start: float
@@ -15,7 +15,7 @@ class Track:
 
 @dataclass(slots=True)
 class Project:
-    """An Audacity project."""
+    """An Audacity project loaded from disk."""
 
     path: Path
     tracks: list[Track] = field(default_factory=list)

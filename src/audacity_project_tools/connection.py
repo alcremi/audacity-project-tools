@@ -1,10 +1,17 @@
 from pathlib import Path
 
-from .pipe import AudacityPipe
+from .process import AudacityProcess
+from .pipe    import AudacityPipe
+from .client  import AudacityClient
 
 
-def connect() -> AudacityPipe:
+def connect() -> AudacityClient:
+    process = AudacityProcess()
+
+    process.start()
+    process.wait_until_ready()
+
     pipe = AudacityPipe.default()
     pipe.connect()
 
-    return pipe
+    return AudacityClient(pipe)

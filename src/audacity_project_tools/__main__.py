@@ -52,8 +52,7 @@ def run() -> int:
         print(f"Error: '{root}' is not a directory.", file=sys.stderr)
         return 1
 
-    pipe = connect()
-    client = AudacityClient(pipe)
+    client = connect()
     converter = ProjectConverter(client)
     scanner = ProjectScanner()
 

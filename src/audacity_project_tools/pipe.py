@@ -114,7 +114,7 @@ class FakePipe3:
     def send(self, command: str) -> str:
         self.command = command
         self.commands.append(command)
-        if str == "Help:":
+        if command == "Help:":
             self.command = "Help:"
             return self._sendHelp(command)
         if command != "GetInfo: Type=Tracks":
@@ -129,3 +129,37 @@ class FakePipe3:
     }
 ]
 """
+
+
+class FakePipe4:
+    def __init__(self) -> None:
+        self.commands: list[str] = []
+        self.responses = iter([
+            "BatchCommand finished: Failed!",
+            "BatchCommand finished: Failed!",
+            """
+[
+    {
+        "name": "Voice",
+        "start": 0,
+        "end": 12.5,
+        "channels": 1
+    }
+]
+BatchCommand finished: OK
+""",
+        ])
+
+    def send(self, command: str) -> str:
+        self.commands.append(command)
+
+        if command.startswith("Help:"):
+            return "BatchCommand finished: OK"
+
+        if command.startswith("OpenProject2:"):
+            return "BatchCommand finished: OK"
+
+        if command == "GetInfo: Type=Tracks":
+            return next(self.responses)
+
+        return "BatchCommand finished: OK"

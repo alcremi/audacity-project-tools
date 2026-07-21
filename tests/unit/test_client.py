@@ -2,7 +2,7 @@ from pathlib import Path
 
 from audacity_project_tools import AudacityPipe
 from audacity_project_tools import AudacityClient
-from audacity_project_tools import FakePipe3
+from audacity_project_tools import FakePipe3, FakePipe4
 
 
 def test_client() -> None:
@@ -61,12 +61,17 @@ def test_get_tracks_command() -> None:
 
 def test_open_project() -> None:
 
-    pipe = FakePipe3()
+    pipe = FakePipe4()
     client = AudacityClient(pipe)
 
     client.open_project(Path("/tmp/test.aup"))
 
-    assert pipe.command == 'OpenProject2: Filename="/tmp/test.aup"'
+    assert pipe.commands == [
+        'OpenProject2: Filename="/tmp/test.aup"',
+        "GetInfo: Type=Tracks",
+        "GetInfo: Type=Tracks",
+        "GetInfo: Type=Tracks",
+    ]
 
 def test_save_project() -> None:
 

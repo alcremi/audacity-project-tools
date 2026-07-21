@@ -29,6 +29,7 @@
 0026  Handle command-line errors gracefully
 0027  Rename exit_project to exit_audacity
 0028  Add 'frozen' to class Track
+0029  Handle asynchronous project loading
 
 
 

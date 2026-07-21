@@ -31,6 +31,7 @@
 0028  Add 'frozen' to class Track
 0029  Handle asynchronous project loading
 0030  Add Audacity process management
+0031  Add Audacity readiness check
 
 
 

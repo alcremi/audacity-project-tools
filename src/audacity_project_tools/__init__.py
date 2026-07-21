@@ -1,5 +1,5 @@
 from .client     import AudacityClient
-from .exceptions import AudacityCommandError, PipeConnectionError
+from .exceptions import AudacityCommandError, PipeConnectionError, AudacityProcessError
 from .pipe       import AudacityPipe
 from .pipe       import FakePipe, FakePipe3, FakePipe4
 from .models     import Track, Project
@@ -12,6 +12,7 @@ __all__ = [
     "AudacityCommandError",
     "AudacityPipe",
 #    "AudacityProcess",
+    "AudacityProcessError",
     "FakePipe",
     "FakePipe3",
     "FakePipe4",

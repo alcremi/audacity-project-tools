@@ -19,3 +19,6 @@ class CommandError(AudacityError):
 
 class AudacityCommandError(Exception):
     """Raised when Audacity reports a command failure."""
+
+class AudacityProcessError(Exception):
+    """Audacity process management error."""

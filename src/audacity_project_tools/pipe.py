@@ -1,13 +1,14 @@
 from __future__ import annotations
 
+import os
 from pathlib import Path
 from typing import TextIO
 
 from .exceptions import PipeConnectionError
 
 
-# _RESPONSE_END = "BatchCommand finished:"
-# if line.startswith(_RESPONSE_END):
+PIPE_TO = Path("/tmp") / f"audacity_script_pipe.to.{os.getuid()}"
+PIPE_FROM = Path("/tmp") / f"audacity_script_pipe.from.{os.getuid()}"
 
 class AudacityPipe:
     """Low-level communication with Audacity through mod-script-pipe."""
@@ -22,6 +23,10 @@ class AudacityPipe:
 
         self._writer: TextIO | None = None
         self._reader: TextIO | None = None
+
+    @classmethod
+    def default(cls) -> AudacityPipe:
+        return cls(PIPE_TO, PIPE_FROM)
 
     def connect(self) -> None:
         """Open the communication pipes to Audacity."""

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from audacity_project_tools import AudacityPipe
+from audacity_project_tools.pipe import AudacityPipe, PIPE_TO, PIPE_FROM
 
 
 def test_pipe_creation() -> None:
@@ -13,4 +13,9 @@ def test_pipe_creation() -> None:
     assert pipe._reader is None
     assert pipe._writer is None
 
-    # response = pipe.send(command)
+
+def test_default_pipe() -> None:
+    pipe = AudacityPipe.default()
+
+    assert pipe._to_pipe == PIPE_TO
+    assert pipe._from_pipe == PIPE_FROM

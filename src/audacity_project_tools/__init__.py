@@ -7,8 +7,11 @@ from .converter  import ProjectConverter
 from .scanner    import ProjectScanner
 from .process    import AudacityProcess
 from .session    import AudacitySession
+from .api        import convert
+
 
 __all__ = [
+    "convert",
     "AudacityClient",
     "AudacityCommandError",
     "AudacityPipe",

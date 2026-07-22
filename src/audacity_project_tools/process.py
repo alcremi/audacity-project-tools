@@ -46,3 +46,16 @@ class AudacityProcess:
             raise AudacityProcessError(
                 "Timed out while waiting for Audacity pipes."
             )
+
+    def wait_for_exit(self, timeout: float = 5.0) -> None:
+        """Wait for Audacity to terminate."""
+
+        if self._process is None:
+            return
+
+        try:
+            self._process.wait(timeout=timeout)
+        except subprocess.TimeoutExpired as exc:
+            raise AudacityProcessError(
+                "Timed out while waiting for Audacity to exit."
+            ) from exc

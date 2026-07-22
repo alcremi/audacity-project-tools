@@ -6,12 +6,14 @@ from .models     import Track, Project
 from .converter  import ProjectConverter
 from .scanner    import ProjectScanner
 from .process    import AudacityProcess
+from .session    import AudacitySession
 
 __all__ = [
     "AudacityClient",
     "AudacityCommandError",
     "AudacityPipe",
-#    "AudacityProcess",
+    "AudacityProcess",
+    "AudacitySession",
     "AudacityProcessError",
     "FakePipe",
     "FakePipe3",

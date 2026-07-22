@@ -34,6 +34,7 @@
 0031  Add Audacity readiness check
 0032  Wait for Audacity before connecting
 0033  Audacity clean stop
+0034  Add AudacitySession class
 
 
 

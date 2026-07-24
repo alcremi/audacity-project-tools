@@ -36,6 +36,7 @@
 0033  Audacity clean stop
 0034  Add AudacitySession class
 0035  Add a global api with a unique function 'convert'
+0036  Add console entry point
 
 
 

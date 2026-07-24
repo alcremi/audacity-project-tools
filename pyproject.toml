@@ -15,3 +15,7 @@ authors = [
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+
+[project.scripts]
+audacity-project-tools = "audacity_project_tools.__main__:main"

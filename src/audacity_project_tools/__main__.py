@@ -30,7 +30,7 @@ def convert_directory(
         print("Converting")
     nb: int = 0
     for source in scanner.scan(root):
-        ++nb
+        nb += 1
         destination = source.with_suffix(".aup3")
 
         if flagDryRun:
@@ -63,6 +63,7 @@ def run() -> int:
     return 0
 
 def main() -> int:
+    print("Entree dans 'main()'")
     try:
         return run()
     except PipeConnectionError:
@@ -71,3 +72,6 @@ def main() -> int:
     except DirectoryNotFoundError: # Not implemented yet
         print("Error: Directory '/tmp/foo' does not exist.", file=sys.stderr)
         return 1
+
+if __name__ == "__main__":
+    raise SystemExit(main())

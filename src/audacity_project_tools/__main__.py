@@ -3,64 +3,30 @@ from pathlib     import Path
 
 from .client     import AudacityClient
 from .converter  import ProjectConverter
-from .scanner    import ProjectScanner
-from .connection import connect
 from .cli        import parse_args
 from .exceptions import PipeConnectionError, DirectoryNotFoundError
-
-
-def convert_directory(
-        root: Path,
-        converter: ProjectConverter,
-        scanner: ProjectScanner,
-        flagDryRun: bool,
-) -> int:
-    print(f"Scanning {root}...")
-
-    projects = list(scanner.scan(root))
-
-    count = len(projects)
-    print(f"Found {count} project{'s' if count != 1 else ''}.")
-    if not projects:
-        return 0
-
-    if flagDryRun:
-        print("Would convert:")
-    else:
-        print("Converting")
-    nb: int = 0
-    for source in scanner.scan(root):
-        nb += 1
-        destination = source.with_suffix(".aup3")
-
-        if flagDryRun:
-            print(f"   {source} -> {destination}")
-            continue
-
-        print(f"   {source.name}")
-        converter.convert(source, destination)
-
-    return nb
+from .api        import convert_directory
 
 
 def run() -> int:
     args = parse_args()
-    root = args.directory
-    flagDryRun = args.dry_run
 
-    if not root.is_dir():
-        print(f"Error: '{root}' is not a directory.", file=sys.stderr)
+    if not args.directory.is_dir():
+        print(
+            f"Error: '{args.directory}' is not a directory.",
+            file=sys.stderr,
+        )
         return 1
 
-    client = connect()
-    converter = ProjectConverter(client)
-    scanner = ProjectScanner()
+    count = convert_directory(
+        args.directory,
+        dry_run=args.dry_run,
+    )
 
-    nb = convert_directory(root, converter, scanner, flagDryRun)
+    print(f"Processed {count} project(s).")
 
-    client.exit_audacity()
-    print("Done.")
     return 0
+
 
 def main() -> int:
     print("Entree dans 'main()'")

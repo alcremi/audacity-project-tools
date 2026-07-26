@@ -1,4 +1,5 @@
 import sys
+import logging
 from pathlib     import Path
 
 from .client     import AudacityClient
@@ -6,7 +7,14 @@ from .converter  import ProjectConverter
 from .cli        import parse_args
 from .exceptions import PipeConnectionError, DirectoryNotFoundError
 from .api        import convert_directory
+from .test_exit  import test_exit, main_test_full_cycle
 
+
+logging.basicConfig(
+    filename="audacity-project-tools.log",
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(message)s",
+)
 
 def run() -> int:
     args = parse_args()
@@ -29,7 +37,6 @@ def run() -> int:
 
 
 def main() -> int:
-    print("Entree dans 'main()'")
     try:
         return run()
     except PipeConnectionError:
@@ -38,6 +45,10 @@ def main() -> int:
     except DirectoryNotFoundError: # Not implemented yet
         print("Error: Directory '/tmp/foo' does not exist.", file=sys.stderr)
         return 1
+
+def main2() -> int:
+    main_test_full_cycle()
+    return 0
 
 if __name__ == "__main__":
     raise SystemExit(main())

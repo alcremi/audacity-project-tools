@@ -38,6 +38,7 @@
 0035  Add a global api with a unique function 'convert'
 0036  Add console entry point
 0037  Move directory conversion workflow to public API
+0038  Robust Audacity session shutdown
 
 
 

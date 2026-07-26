@@ -36,20 +36,21 @@ def convert_directory(
             count += 1
         return count
 
-    session = AudacitySession()
 
     count = 0
 
-    try:
-        client = session.start()
-        converter = ProjectConverter(client)
+    for source in projects:
+        session = AudacitySession()
 
-        for source in projects:
+        try:
+            client = session.start()
+            converter = ProjectConverter(client)
+
             destination = source.with_suffix(".aup3")
             converter.convert(source, destination)
             count += 1
 
-    finally:
-        session.close()
+        finally:
+            session.close()
 
     return count

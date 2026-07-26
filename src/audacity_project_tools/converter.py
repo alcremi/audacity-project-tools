@@ -1,6 +1,11 @@
 from pathlib import Path
 
+import time
+import logging
+
 from .client import AudacityClient
+
+logger = logging.getLogger(__name__)
 
 
 class ProjectConverter:
@@ -14,6 +19,11 @@ class ProjectConverter:
             source: Path,
             destination: Path,
     ) -> None:
+        logger.info(
+            "Converting %s -> %s",
+            source,
+            destination,
+        )
         project = self._client.load_project(source)
 
         self._client.save_project(destination)

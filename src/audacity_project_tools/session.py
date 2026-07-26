@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import time
+
 from .client  import AudacityClient
 from .pipe    import AudacityPipe
 from .process import AudacityProcess
@@ -25,6 +27,7 @@ class AudacitySession:
         self._process.wait_until_ready()
 
         self._pipe.connect()
+        time.sleep(2)
 
         self._client = AudacityClient(self._pipe)
 
@@ -33,5 +36,4 @@ class AudacitySession:
     def close(self) -> None:
         if self._client is not None:
             self._client.exit_audacity()
-
-        self._process.wait_for_exit()
+            self._process.wait_for_exit()

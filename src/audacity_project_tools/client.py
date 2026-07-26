@@ -70,7 +70,7 @@ class AudacityClient:
     def exit_audacity(self) -> None:
         """Close the project (which must have been saved before) and close the Audacity instance."""
 
-        self._execute("Exit:")
+        self._pipe.send("Exit:")
 
     def load_project(self, path: Path) -> Project:
         self.open_project(path)

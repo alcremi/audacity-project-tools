@@ -12,7 +12,8 @@ from .test_exit  import test_exit, main_test_full_cycle
 
 logging.basicConfig(
     filename="audacity-project-tools.log",
-    level=logging.INFO,
+    #level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(message)s",
 )
 

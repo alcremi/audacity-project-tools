@@ -1,13 +1,17 @@
 from pathlib import Path
+import logging
 
 from .converter import ProjectConverter
 from .scanner   import ProjectScanner
 from .session   import AudacitySession
 
+logger = logging.getLogger(__name__)
+
 
 def convert(source: Path, destination: Path) -> None:
     """Convert an Audacity project."""
 
+    logger.debug("Conversion de %s", source)
     session = AudacitySession()
 
     try:
@@ -18,6 +22,7 @@ def convert(source: Path, destination: Path) -> None:
 
     finally:
         session.close()
+    logger.debug("Conversion terminee produisant %s", destination)
 
 
 def convert_directory(
@@ -49,6 +54,9 @@ def convert_directory(
             destination = source.with_suffix(".aup3")
             converter.convert(source, destination)
             count += 1
+
+        except Exception:
+            logger.exception("Exception encountered while processing file %s", source)
 
         finally:
             session.close()

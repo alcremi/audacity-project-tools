@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import logging
 import subprocess
 import signal
 import time
@@ -10,6 +11,8 @@ from pathlib import Path
 from .pipe       import PIPE_TO, PIPE_FROM
 from .exceptions import AudacityProcessError
 
+logger = logging.getLogger(__name__)
+
 
 class AudacityProcess:
     """Manage the Audacity application process."""
@@ -17,7 +20,6 @@ class AudacityProcess:
     def __init__(
         self,
         executable: str = "audacity",
-        #executable: str = "/huge/Telechargements/audacity-linux-3.7.8-x64-22.04.AppImage",
         pipe_to: Path = PIPE_TO,
         pipe_from: Path = PIPE_FROM,
     ) -> None:
@@ -33,6 +35,7 @@ class AudacityProcess:
 
     def start(self) -> None:
         """Start Audacity."""
+        logger.debug("Starting Audacity")
 
         self.cleanup_pipes()
 
@@ -51,7 +54,6 @@ class AudacityProcess:
 
         while time.monotonic() < deadline:
             if self._pipe_to.exists() and self._pipe_from.exists():
-                print("On a detecte les 2 pipes")
                 return
 
             time.sleep(0.1)
@@ -60,15 +62,6 @@ class AudacityProcess:
         raise AudacityProcessError(
             "Timed out while waiting for Audacity pipes."
         )
-
-    def cleanup_debug_reports_old(self) -> None:
-        """Remove Audacity debug report directories."""
-
-        tmp = Path("/tmp")
-
-        for path in tmp.glob("Audacity_dbgrpt-*"):
-            if path.is_dir():
-                shutil.rmtree(path)
 
     def cleanup_debug_reports(self) -> None:
         """Remove Audacity debug report directories."""
@@ -106,3 +99,4 @@ class AudacityProcess:
             finally:
                 self.cleanup_pipes()
                 self.cleanup_debug_reports()
+                logger.debug("Stopping Audacity")

@@ -41,7 +41,7 @@ class AudacityPipe:
     def send(self, command: str) -> str:
         """Send a command and return Audacity response."""
 
-        logger.info(">>> %s", command)
+        logger.debug(">>> %s", command)
 
         if not self._to_pipe.exists() or not self._from_pipe.exists():
             raise PipeConnectionError("Pipe is not available.")
@@ -67,7 +67,7 @@ class AudacityPipe:
 
         response = "".join(lines)
 
-        logger.info("<<< %s", response.strip())
+        logger.debug("<<< %s", response.rstrip())
 
         return response
 

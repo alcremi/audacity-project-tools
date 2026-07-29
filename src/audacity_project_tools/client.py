@@ -1,10 +1,13 @@
 from pathlib import Path
 import time
+import logging
 
 from .exceptions import AudacityCommandError
 from .models     import Track, Project
 from .parsers    import parse_tracks
 from .pipe       import AudacityPipe
+
+logger = logging.getLogger(__name__)
 
 class AudacityClient:
     """High-level interface to Audacity scripting commands."""

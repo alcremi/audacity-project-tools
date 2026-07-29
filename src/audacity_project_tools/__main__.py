@@ -27,12 +27,17 @@ def run() -> int:
         )
         return 1
 
-    count = convert_directory(
+    report = convert_directory(
         args.directory,
         dry_run=args.dry_run,
     )
 
-    print(f"Processed {count} project(s).")
+    if args.dry_run == True:
+        print(f"Found {report.count} project(s).")
+    else:
+        print(f"{report.count} project(s) found")
+        print(f"{report.converted} converted")
+        print(f"{report.failed} failed")
 
     return 0
 

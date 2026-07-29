@@ -39,7 +39,8 @@
 0036  Add console entry point
 0037  Move directory conversion workflow to public API
 0038  Robust Audacity session shutdown
-0039  Add logging and resilient batch conversion.
+0039  Add logging and resilient batch conversion
+0040  Continue batch conversion after project failures
 
 
 

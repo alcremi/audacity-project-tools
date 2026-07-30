@@ -9,10 +9,16 @@ from .session   import AudacitySession
 logger = logging.getLogger(__name__)
 
 @dataclass
+class ConversionFailure:
+    source: Path
+    reason: str
+
+@dataclass
 class ConversionReport:
     count: int
     converted: int
     failed: int
+    failures: list[ConversionFailure]
 
 
 def convert(source: Path, destination: Path) -> None:
@@ -46,12 +52,13 @@ def convert_directory(
         for source in projects:
             print(f"{source} -> {source.with_suffix('.aup3')}")
             count += 1
-        return ConversionReport(count=count, converted=0, failed=0)
+        return ConversionReport(count=count, converted=0, failed=0, failures=[])
 
 
     count = 0
     converted = 0
     failed = 0
+    failures: list[ConversionFailure] = []
 
     for source in projects:
         session = AudacitySession()
@@ -64,13 +71,19 @@ def convert_directory(
             destination = source.with_suffix(".aup3")
             converter.convert(source, destination)
 
-        except Exception:
+        except Exception as exc:
             logger.exception("Conversion failed for %s", source)
             failed += 1
+            failures.append(
+                ConversionFailure(
+                    source=source,
+                    reason=str(exc),
+                )
+            )
         else:
             converted += 1
 
         finally:
             session.close()
 
-    return ConversionReport(count=count, converted=converted, failed=failed)
+    return ConversionReport(count=count, converted=converted, failed=failed, failures=failures)

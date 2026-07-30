@@ -74,7 +74,8 @@ def test_convert_directory_continues_after_failure(
 
     assert report.count == 3
     assert report.converted == 2
-    assert report.failed == 1
+    assert report.failures[0].source == Path("B.aup")
+    assert "Conversion failed" in report.failures[0].reason
 
     assert FakeConverter.calls == [
         Path("A.aup"),

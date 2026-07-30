@@ -41,6 +41,7 @@
 0038  Robust Audacity session shutdown
 0039  Add logging and resilient batch conversion
 0040  Continue batch conversion after project failures
+0041  Report failed project conversions
 
 
 

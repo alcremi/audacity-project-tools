@@ -1,3 +1,4 @@
+from .api        import ConversionFailure, ConversionReport
 from .client     import AudacityClient
 from .exceptions import AudacityCommandError, PipeConnectionError, AudacityProcessError
 from .pipe       import AudacityPipe
@@ -18,6 +19,8 @@ __all__ = [
     "AudacityProcess",
     "AudacitySession",
     "AudacityProcessError",
+    "ConversionFailure",
+    "ConversionReport",
     "FakePipe",
     "FakePipe3",
     "FakePipe4",

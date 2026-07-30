@@ -2,6 +2,7 @@ import sys
 import logging
 from pathlib     import Path
 
+from .api        import ConversionFailure, ConversionReport
 from .client     import AudacityClient
 from .converter  import ProjectConverter
 from .cli        import parse_args
@@ -16,6 +17,20 @@ logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(message)s",
 )
+
+def print_report(report: ConversionReport, directory: Path) -> None:
+    print(f"{report.count} project(s) found")
+    print(f"{report.converted} converted")
+    print(f"{report.failed} failed")
+    if report.failures:
+        print()
+        print("Failed projects:")
+
+        for failure in report.failures:
+            relative = failure.source.relative_to(directory)
+
+            print(f"  {relative}")
+            print(f"      {failure.reason}")
 
 def run() -> int:
     args = parse_args()
@@ -35,9 +50,7 @@ def run() -> int:
     if args.dry_run == True:
         print(f"Found {report.count} project(s).")
     else:
-        print(f"{report.count} project(s) found")
-        print(f"{report.converted} converted")
-        print(f"{report.failed} failed")
+        print_report(report, args.directory)
 
     return 0
 

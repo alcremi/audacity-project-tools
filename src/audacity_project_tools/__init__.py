@@ -1,6 +1,6 @@
 from .api        import ConversionFailure, ConversionReport
 from .client     import AudacityClient
-from .exceptions import AudacityCommandError, PipeConnectionError, AudacityProcessError
+from .exceptions import AudacityCommandError, PipeConnectionError, AudacityProcessError, ConversionError
 from .pipe       import AudacityPipe
 from .pipe       import FakePipe, FakePipe3, FakePipe4
 from .models     import Track, Project
@@ -19,6 +19,7 @@ __all__ = [
     "AudacityProcess",
     "AudacitySession",
     "AudacityProcessError",
+    "ConversionError",
     "ConversionFailure",
     "ConversionReport",
     "FakePipe",

@@ -3,7 +3,8 @@ from pathlib import Path
 import time
 import logging
 
-from .client import AudacityClient
+from .client     import AudacityClient
+from .exceptions import ConversionError
 
 logger = logging.getLogger(__name__)
 
@@ -27,3 +28,8 @@ class ProjectConverter:
         project = self._client.load_project(source)
 
         self._client.save_project(destination)
+
+        if not destination.exists():
+            raise ConversionError(
+                f"Destination file '{destination}' was not created."
+            )

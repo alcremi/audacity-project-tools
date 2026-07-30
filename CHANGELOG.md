@@ -42,6 +42,10 @@
 0039  Add logging and resilient batch conversion
 0040  Continue batch conversion after project failures
 0041  Report failed project conversions
+0042  Handle Audacity label tracks in parser
+	- Ignore non-wave tracks returned by Audacity
+	- Prevent parsing errors on label tracks
+	- Add tests for mixed audio/label track responses
 
 
 

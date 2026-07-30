@@ -6,14 +6,23 @@ from .models import Track
 
 
 def parse_tracks(response: str) -> list[Track]:
+
     data = json.loads(response)
 
-    return [
-        Track(
-            name=item["name"],
-            start=item["start"],
-            end=item["end"],
-            channels=item["channels"],
+    tracks = []
+
+    for item in data:
+
+        if item.get("kind") != "wave":
+            continue
+
+        tracks.append(
+            Track(
+                name=item["name"],
+                start=item["start"],
+                end=item["end"],
+                channels=item["channels"],
+            )
         )
-        for item in data
-    ]
+
+    return tracks

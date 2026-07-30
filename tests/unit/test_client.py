@@ -41,6 +41,7 @@ class FakePipe2:
 [
     {
         "name": "Voice",
+        "kind": "wave",
         "start": 0,
         "end": 12.5,
         "channels": 1

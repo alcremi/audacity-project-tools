@@ -132,6 +132,7 @@ class FakePipe:
 [
   {
     "name": "Voice",
+    "kind": "wave",
     "start": 0,
     "end": 12.5,
     "channels": 1
@@ -160,6 +161,7 @@ class FakePipe3:
 [
     {
         "name": "Voice",
+        "kind": "wave",
         "start": 0,
         "end": 12.5,
         "channels": 1
@@ -178,6 +180,7 @@ class FakePipe4:
 [
     {
         "name": "Voice",
+        "kind": "wave",
         "start": 0,
         "end": 12.5,
         "channels": 1

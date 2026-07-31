@@ -51,6 +51,7 @@
 	- Skip projects already converted to aup3
 	- Detect missing _data directories
 	- Add validation result model and tests
+0044  Improve conversion reporting and project validation
 
 
 ### Added

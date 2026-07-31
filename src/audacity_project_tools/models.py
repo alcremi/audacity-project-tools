@@ -30,3 +30,16 @@ class ConversionDecision(Enum):
 class ValidationResult:
     decision: ConversionDecision
     message: str | None = None
+
+@dataclass
+class ConversionFailure:
+    source: Path
+    reason: str
+
+@dataclass(slots=True)
+class ConversionReport:
+    count: int = 0
+    converted: int = 0
+    skipped: int = 0
+    failed: int = 0
+    failures: list[ConversionFailure] = field(default_factory=list)

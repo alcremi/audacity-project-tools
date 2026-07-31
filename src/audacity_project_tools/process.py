@@ -74,6 +74,13 @@ class AudacityProcess:
             if path.is_dir():
                 shutil.rmtree(path)
 
+        if os.path.isfile("audacity.cfg"):
+            os.remove("audacity.cfg")
+        if os.path.isfile("pluginregistry.cfg"):
+            os.remove("pluginregistry.cfg")
+        if os.path.isfile("pluginsettings.cfg"):
+            os.remove("pluginsettings.cfg")
+
     def wait_for_exit(self, timeout: float = 5.0) -> None:
         """Wait for Audacity to terminate, forcing termination if needed."""
 

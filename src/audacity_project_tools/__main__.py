@@ -2,13 +2,12 @@ import sys
 import logging
 from pathlib     import Path
 
-from .api        import ConversionFailure, ConversionReport
+from .api        import convert_directory
 from .client     import AudacityClient
 from .converter  import ProjectConverter
 from .cli        import parse_args
 from .exceptions import PipeConnectionError, DirectoryNotFoundError
-from .api        import convert_directory
-from .test_exit  import test_exit, main_test_full_cycle
+from .models     import ConversionFailure, ConversionReport
 
 
 logging.basicConfig(
@@ -19,10 +18,10 @@ logging.basicConfig(
 )
 
 def print_report(report: ConversionReport, directory: Path) -> None:
-    print(f"{report.count} project(s) found")
-    print(f"{report.converted} converted")
-    print(f"{report.skipped} skipped")
-    print(f"{report.failed} failed")
+    print(f"Projects found : {report.count}")
+    print(f"Converted      : {report.converted}")
+    print(f"Skipped        : {report.skipped}")
+    print(f"Failed         : {report.failed}")
     if report.failures:
         print()
         print("Failed projects:")
@@ -48,10 +47,7 @@ def run() -> int:
         dry_run=args.dry_run,
     )
 
-    if args.dry_run == True:
-        print(f"Found {report.count} project(s), skipped = {report.skipped}, failed = {report.failed}.")
-    else:
-        print_report(report, args.directory)
+    print_report(report, args.directory)
 
     return 0
 
@@ -65,10 +61,6 @@ def main() -> int:
     except DirectoryNotFoundError: # Not implemented yet
         print("Error: Directory '/tmp/foo' does not exist.", file=sys.stderr)
         return 1
-
-def main2() -> int:
-    main_test_full_cycle()
-    return 0
 
 if __name__ == "__main__":
     raise SystemExit(main())

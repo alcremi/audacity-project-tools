@@ -96,3 +96,58 @@ def test_convert_directory_continues_after_failure(
         Path("B.aup"),
         Path("C.aup"),
     ]
+
+def test_convert_directory_does_not_start_audacity_for_skipped_projects(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+
+    class FakeScanner:
+        def scan(self, root: Path):
+            yield Path("A.aup")
+
+    def fake_should_convert(source: Path) -> ValidationResult:
+        return ValidationResult(
+            decision=ConversionDecision.SKIP_ALREADY_CONVERTED,
+            message="Project already converted.",
+        )
+
+    start_called = False
+
+    class FakeSession:
+        def start(self):
+            nonlocal start_called
+            start_called = True
+            return object()
+
+        def close(self):
+            pass
+
+    class FakeConverter:
+        calls: list[Path] = []
+
+        def __init__(self, client):
+            pass
+
+        def convert(
+            self,
+            source: Path,
+            destination: Path,
+        ) -> None:
+            self.calls.append(source)
+
+    monkeypatch.setattr(api, "ProjectScanner", FakeScanner)
+    monkeypatch.setattr(api, "should_convert", fake_should_convert)
+    monkeypatch.setattr(api, "AudacitySession", FakeSession)
+    monkeypatch.setattr(api, "ProjectConverter", FakeConverter)
+
+    report = convert_directory(Path("/tmp"))
+
+    assert report.count == 1
+    assert report.converted == 0
+    assert report.skipped == 1
+    assert report.failed == 0
+
+    assert report.failures == []
+
+    assert start_called is False
+    assert FakeConverter.calls == []

@@ -13,7 +13,6 @@ class DirectoryNotFoundError(AudacityError):
         self.directory = directory
         super().__init__(str(directory))
 
-
 class CommandError(AudacityError):
     """Raised when Audacity rejects a command."""
 

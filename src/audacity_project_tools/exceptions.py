@@ -24,4 +24,4 @@ class AudacityProcessError(Exception):
     """Audacity process management error."""
 
 class ConversionError(Exception):
-    """The project conversion did not complete successfully."""
+    """The conversion did not produce the expected output."""

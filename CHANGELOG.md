@@ -46,7 +46,11 @@
 	- Ignore non-wave tracks returned by Audacity
 	- Prevent parsing errors on label tracks
 	- Add tests for mixed audio/label track responses
-
+0043  Validate projects before conversion
+	- Add project validation before starting Audacity
+	- Skip projects already converted to aup3
+	- Detect missing _data directories
+	- Add validation result model and tests
 
 
 ### Added

@@ -25,11 +25,18 @@ class ProjectConverter:
             source,
             destination,
         )
-        project = self._client.load_project(source)
+        self._client.load_project(source)
 
         self._client.save_project(destination)
 
-        if not destination.exists():
-            raise ConversionError(
-                f"Destination file '{destination}' was not created."
-            )
+        deadline = time.monotonic() + 5
+
+        while time.monotonic() < deadline:
+            if destination.exists():
+                return
+
+            time.sleep(0.1)
+
+        raise ConversionError(
+            f"Destination file '{destination}' was not created."
+        )

@@ -4,7 +4,15 @@ import pytest
 
 from audacity_project_tools.api import convert_directory
 import audacity_project_tools.api as api
+from audacity_project_tools.models import (
+    ConversionDecision,
+    ValidationResult,
+)
 
+def fake_should_convert(source: Path) -> ValidationResult:
+    return ValidationResult(
+        decision=ConversionDecision.CONVERT,
+    )
 
 class FakeScanner:
 
@@ -66,6 +74,12 @@ def test_convert_directory_continues_after_failure(
         api,
         "ProjectConverter",
         FakeConverter,
+    )
+
+    monkeypatch.setattr(
+        api,
+        "should_convert",
+        fake_should_convert,
     )
 
     report = convert_directory(

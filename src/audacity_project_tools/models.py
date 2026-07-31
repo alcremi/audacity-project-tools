@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import Enum, auto
 from pathlib import Path
 
 
@@ -19,3 +20,13 @@ class Project:
 
     path: Path
     tracks: list[Track] = field(default_factory=list)
+
+class ConversionDecision(Enum):
+    CONVERT = auto()
+    SKIP_ALREADY_CONVERTED = auto()
+    FAIL_MISSING_DATA = auto()
+
+@dataclass(frozen=True, slots=True)
+class ValidationResult:
+    decision: ConversionDecision
+    message: str | None = None

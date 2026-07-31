@@ -21,6 +21,7 @@ logging.basicConfig(
 def print_report(report: ConversionReport, directory: Path) -> None:
     print(f"{report.count} project(s) found")
     print(f"{report.converted} converted")
+    print(f"{report.skipped} skipped")
     print(f"{report.failed} failed")
     if report.failures:
         print()
@@ -48,7 +49,7 @@ def run() -> int:
     )
 
     if args.dry_run == True:
-        print(f"Found {report.count} project(s).")
+        print(f"Found {report.count} project(s), skipped = {report.skipped}, failed = {report.failed}.")
     else:
         print_report(report, args.directory)
 

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from audacity_project_tools import AudacityPipe
 from audacity_project_tools import AudacityClient
-from audacity_project_tools import FakePipe3, FakePipe4
+from test_pipe              import FakePipe3, FakePipe4
 
 
 def test_client() -> None:

@@ -52,7 +52,7 @@ class FakeProcess2:
         self.waited = True
 
 
-class FakeClient2:
+class FakeClient:
     def __init__(self) -> None:
         self.exited = False
 
@@ -65,7 +65,7 @@ def test_session_close_exits_audacity() -> None:
 
     session = AudacitySession(process=process)
 
-    client = FakeClient2()
+    client = FakeClient()
     session._client = client
 
     session.close()

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from audacity_project_tools import Project
 from audacity_project_tools import Track
-from audacity_project_tools import FakePipe3
+from test_pipe              import FakePipe3
 
 
 def test_project_creation() -> None:

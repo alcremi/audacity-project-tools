@@ -12,8 +12,30 @@ logger = logging.getLogger(__name__)
 class ProjectConverter:
     """Convert legacy Audacity projects."""
 
-    def __init__(self, client: AudacityClient) -> None:
+    def __init__(
+            self,
+            client,
+            save_timeout: float = 5.0,
+    ):
         self._client = client
+        self._save_timeout = save_timeout
+
+    def _wait_for_saved_project(
+            self,
+            destination: Path,
+    ) -> None:
+        timeout = 5.0
+        deadline = time.monotonic() + timeout
+
+        while time.monotonic() < deadline:
+            if destination.exists():
+                return
+
+            time.sleep(0.1)
+
+        raise ConversionError(
+            f"{destination} was not created."
+        )
 
     def convert(
             self,

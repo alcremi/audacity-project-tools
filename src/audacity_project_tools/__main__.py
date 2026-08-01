@@ -2,7 +2,7 @@ import sys
 import logging
 from pathlib     import Path
 
-from .api        import convert_directory
+from .api        import convert_directory, format_report
 from .client     import AudacityClient
 from .converter  import ProjectConverter
 from .cli        import parse_args
@@ -12,25 +12,10 @@ from .models     import ConversionFailure, ConversionReport
 
 logging.basicConfig(
     filename="audacity-project-tools.log",
-    #level=logging.INFO,
-    level=logging.DEBUG,
+    level=logging.INFO,
+    #level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(message)s",
 )
-
-def print_report(report: ConversionReport, directory: Path) -> None:
-    print(f"Projects found : {report.count}")
-    print(f"Converted      : {report.converted}")
-    print(f"Skipped        : {report.skipped}")
-    print(f"Failed         : {report.failed}")
-    if report.failures:
-        print()
-        print("Failed projects:")
-
-        for failure in report.failures:
-            relative = failure.source.relative_to(directory)
-
-            print(f"  {relative}")
-            print(f"      {failure.reason}")
 
 def run() -> int:
     args = parse_args()
@@ -47,7 +32,12 @@ def run() -> int:
         dry_run=args.dry_run,
     )
 
-    print_report(report, args.directory)
+    text = format_report(report, args.directory)
+
+    print(text)
+
+    report_file = args.directory / "conversion-report.txt"
+    report_file.write_text(text, encoding="utf-8",)
 
     return 0
 

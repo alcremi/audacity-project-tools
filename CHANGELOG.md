@@ -53,6 +53,11 @@
 	- Add validation result model and tests
 0044  Improve conversion reporting and project validation
 0045  Validate converted project output
+	- Check that SaveProject2 actually creates the .aup3 file
+	- Add timeout while waiting for conversion output
+	- Raise ConversionError when output is missing
+	- Add success and failure unit tests
+0046  Extract conversion report formatting
 
 
 ### Added

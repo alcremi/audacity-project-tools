@@ -2,12 +2,46 @@ from pathlib import Path
 
 import pytest
 
-from audacity_project_tools.api import convert_directory
+from audacity_project_tools.api import convert_directory, format_report
 import audacity_project_tools.api as api
-from audacity_project_tools.models import (
-    ConversionDecision,
-    ValidationResult,
-)
+from audacity_project_tools.models import (ConversionDecision, ValidationResult, ConversionReport, ConversionFailure)
+
+
+def test_format_report_with_failure(tmp_path: Path) -> None:
+
+    report = ConversionReport(
+        count=3,
+        converted=2,
+        skipped=0,
+        failed=1,
+        failures=[
+            ConversionFailure(
+                source=tmp_path / "A.aup",
+                reason="Missing data directory",
+            )
+        ],
+    )
+
+    text = format_report(report, tmp_path)
+
+    assert "Projects found : 3" in text
+    assert "Converted      : 2" in text
+    assert "Failed         : 1" in text
+    assert "A.aup" in text
+    assert "Missing data directory" in text
+
+def test_format_report_without_failure(tmp_path: Path) -> None:
+    report = ConversionReport(
+        count=3,
+        converted=2,
+        skipped=0,
+        failed=0,
+        failures=[],
+    )
+    text = format_report(report, tmp_path)
+
+    assert "Failed projects:" not in text
+
 
 def fake_should_convert(source: Path) -> ValidationResult:
     return ValidationResult(

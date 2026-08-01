@@ -91,3 +91,29 @@ def convert_directory(
                 )
 
     return ConversionReport(count=count, converted=converted, skipped=skipped, failed=failed, failures=failures)
+
+
+def format_report(
+    report: ConversionReport,
+    directory: Path,
+) -> str:
+    """Return a formatted conversion report."""
+
+    lines = [
+        f"Projects found : {report.count}",
+        f"Converted      : {report.converted}",
+        f"Skipped        : {report.skipped}",
+        f"Failed         : {report.failed}",
+    ]
+
+    if report.failures:
+        lines.append("")
+        lines.append("Failed projects:")
+
+        for failure in report.failures:
+            relative = failure.source.relative_to(directory)
+
+            lines.append(f"  {relative}")
+            lines.append(f"      {failure.reason}")
+
+    return "\n".join(lines)

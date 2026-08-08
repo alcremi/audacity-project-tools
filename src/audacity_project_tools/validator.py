@@ -5,23 +5,25 @@ from pathlib import Path
 from .models import ValidationResult, ConversionDecision
 
 
-def should_convert(source: Path) -> ValidationResult:
-    """Determine whether a project should be converted."""
+def should_convert(
+    source: Path,
+    destination: Path,
+) -> ValidationResult:
 
-    destination = source.with_suffix(".aup3")
+    data_dir = source.with_name(
+        source.stem + "_data"
+    )
+
+    if not data_dir.is_dir():
+        return ValidationResult(
+            decision=ConversionDecision.FAIL_MISSING_DATA,
+            message=f"Missing data directory: {data_dir.name}",
+        )
 
     if destination.exists():
         return ValidationResult(
             decision=ConversionDecision.SKIP_ALREADY_CONVERTED,
-            message="Project already converted.",
-        )
-
-    data_directory = source.with_name(f"{source.stem}_data")
-
-    if not data_directory.is_dir():
-        return ValidationResult(
-            decision=ConversionDecision.FAIL_MISSING_DATA,
-            message=f"Missing data directory: {data_directory.name}",
+            message=f"Already converted: {destination.name}",
         )
 
     return ValidationResult(

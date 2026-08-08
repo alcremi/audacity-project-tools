@@ -27,4 +27,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Show planned conversions without modifying files.",
     )
 
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        help="Directory where converted projects are written.",
+    )
+
     return parser.parse_args(argv)

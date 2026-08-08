@@ -58,6 +58,7 @@
 	- Raise ConversionError when output is missing
 	- Add success and failure unit tests
 0046  Extract conversion report formatting
+0047  Add output directory support
 
 
 ### Added

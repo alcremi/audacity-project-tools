@@ -30,6 +30,7 @@ def convert(source: Path, destination: Path) -> None:
 
 def convert_directory(
     root: Path,
+    output_dir: Path | None = None,
     dry_run: bool = False,
 ) -> ConversionReport:
     """Convert all Audacity projects found in a directory."""
@@ -44,37 +45,51 @@ def convert_directory(
     failures: list[ConversionFailure] = []
 
     for source in projects:
-        validation = should_convert(source)
+        relative = source.relative_to(root)
+
+        if output_dir is None:
+            destination = source.with_suffix(".aup3")
+        else:
+            destination = output_dir / relative.with_suffix(".aup3")
+
+        validation = should_convert(source, destination)
+
         count += 1
 
         match validation.decision:
             case ConversionDecision.CONVERT:
                 if dry_run:
-                    print(f"{source} -> {source.with_suffix('.aup3')}")
-                else:
-                    session = AudacitySession()
+                    print(f"{source} -> {destination}")
+                    continue
 
-                    try:
-                        client = session.start()
-                        converter = ProjectConverter(client)
+                destination.parent.mkdir(
+                    parents=True,
+                    exist_ok=True,
+                )
 
-                        destination = source.with_suffix(".aup3")
-                        converter.convert(source, destination)
+                session = AudacitySession()
 
-                    except Exception as exc:
-                        logger.exception("Conversion failed for %s", source)
-                        failed += 1
-                        failures.append(
-                            ConversionFailure(
-                                source=source,
-                                reason=str(exc),
-                            )
+                try:
+                    client = session.start()
+                    converter = ProjectConverter(client)
+                    converter.convert(source, destination)
+
+                except Exception as exc:
+                    logger.exception("Conversion failed for %s", source)
+                    failed += 1
+                    failures.append(
+                        ConversionFailure(
+                            source=source,
+                            reason=str(exc),
                         )
-                    else:
-                        converted += 1
+                    )
 
-                    finally:
-                        session.close()
+                else:
+                    converted += 1
+
+                finally:
+                    session.close()
+
             case ConversionDecision.SKIP_ALREADY_CONVERTED:
                 skipped += 1
             case ConversionDecision.FAIL_MISSING_DATA:

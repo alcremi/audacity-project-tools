@@ -8,51 +8,67 @@ MISSING_DATA = "Missing data directory"
 
 def test_should_convert_returns_convert(tmp_path: Path) -> None:
     source = tmp_path / "project.aup"
-    source.touch()
+    destination = tmp_path / "project.aup3"
 
-    (tmp_path / "project_data").mkdir()
+    data_dir = tmp_path / "project_data"
+    data_dir.mkdir()
 
-    result = should_convert(source)
+    result = should_convert(source, destination)
 
-    assert result.decision is ConversionDecision.CONVERT
-    assert result.message is None
+    assert result.decision == ConversionDecision.CONVERT
 
-
-def test_should_convert_skips_existing_aup3(tmp_path: Path) -> None:
-    source = tmp_path / "project.aup"
-    source.touch()
-
-    (tmp_path / "project.aup3").touch()
-    (tmp_path / "project_data").mkdir()
-
-    result = should_convert(source)
-
-    assert result.decision is ConversionDecision.SKIP_ALREADY_CONVERTED
-    assert result.message == ALREADY_CONVERTED
-
-
-def test_should_convert_detects_missing_data_directory(
+def test_should_convert_returns_skip_if_destination_exists(
     tmp_path: Path,
 ) -> None:
     source = tmp_path / "project.aup"
-    source.touch()
+    destination = tmp_path / "project.aup3"
 
-    result = should_convert(source)
+    data_dir = tmp_path / "project_data"
+    data_dir.mkdir()
 
-    assert result.decision is ConversionDecision.FAIL_MISSING_DATA
-    assert "project_data" in result.message
+    destination.touch()
+
+    result = should_convert(source, destination)
+
+    assert result.decision == ConversionDecision.SKIP_ALREADY_CONVERTED
 
 
-def test_should_convert_prefers_skip_over_missing_data(
+def test_should_convert_returns_fail_if_data_missing(
     tmp_path: Path,
 ) -> None:
     source = tmp_path / "project.aup"
-    source.touch()
+    destination = tmp_path / "project.aup3"
 
-    (tmp_path / "project.aup3").touch()
+    result = should_convert(source, destination)
 
-    result = should_convert(source)
+    assert result.decision == ConversionDecision.FAIL_MISSING_DATA
 
-    assert result.decision is (
-        ConversionDecision.SKIP_ALREADY_CONVERTED
-    )
+
+def test_should_convert_reports_missing_data(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "project.aup"
+    destination = tmp_path / "project.aup3"
+
+    result = should_convert(source, destination)
+
+    assert result.message == "Missing data directory: project_data"
+
+
+def test_should_convert_uses_destination_path(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source" / "project.aup"
+    destination = tmp_path / "converted" / "project.aup3"
+
+    source.parent.mkdir()
+    destination.parent.mkdir()
+
+    data_dir = source.with_name("project_data")
+    data_dir.mkdir()
+
+    destination.touch()
+
+    result = should_convert(source, destination)
+
+    assert result.decision == ConversionDecision.SKIP_ALREADY_CONVERTED

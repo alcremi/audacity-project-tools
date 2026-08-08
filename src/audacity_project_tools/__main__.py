@@ -12,8 +12,8 @@ from .models     import ConversionFailure, ConversionReport
 
 logging.basicConfig(
     filename="audacity-project-tools.log",
-    level=logging.INFO,
-    #level=logging.DEBUG,
+    #level=logging.INFO,
+    level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(message)s",
 )
 
@@ -29,6 +29,7 @@ def run() -> int:
 
     report = convert_directory(
         args.directory,
+        output_dir=args.output_dir,
         dry_run=args.dry_run,
     )
 

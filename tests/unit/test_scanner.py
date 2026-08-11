@@ -29,3 +29,54 @@ def test_scan_recursive(tmp_path: Path) -> None:
     assert list(scanner.scan(tmp_path)) == [
         project / "concert.aup",
     ]
+
+def test_scan_finds_aup_files(tmp_path: Path) -> None:
+    first = tmp_path / "first.aup"
+    second = tmp_path / "second.aup"
+    other = tmp_path / "other.txt"
+
+    first.touch()
+    second.touch()
+    other.touch()
+
+    scanner = ProjectScanner()
+
+    result = list(scanner.scan(tmp_path))
+
+    assert result == [
+        first,
+        second,
+    ]
+
+def test_scan_finds_aup3_files(tmp_path: Path) -> None:
+    first = tmp_path / "first.aup3"
+    second = tmp_path / "second.aup3"
+    other = tmp_path / "other.aup"
+
+    first.touch()
+    second.touch()
+    other.touch()
+
+    scanner = ProjectScanner()
+
+    result = list(scanner.scan(tmp_path, "*.aup3"))
+
+    assert result == [
+        first,
+        second,
+    ]
+
+def test_scan_finds_projects_in_subdirectories(
+    tmp_path: Path,
+) -> None:
+    directory = tmp_path / "Audio"
+    directory.mkdir()
+
+    project = directory / "project.aup3"
+    project.touch()
+
+    scanner = ProjectScanner()
+
+    result = list(scanner.scan(tmp_path, "*.aup3"))
+
+    assert result == [project]

@@ -5,7 +5,7 @@ from pathlib     import Path
 from .api        import convert_directory, format_report
 from .client     import AudacityClient
 from .converter  import ProjectConverter
-from .cli        import parse_args
+from .cli        import parse_args, validate_args
 from .exceptions import PipeConnectionError, DirectoryNotFoundError
 from .models     import ConversionFailure, ConversionReport
 
@@ -19,6 +19,7 @@ logging.basicConfig(
 
 def run() -> int:
     args = parse_args()
+    validate_args(args)
 
     if not args.directory.is_dir():
         print(
@@ -29,6 +30,7 @@ def run() -> int:
 
     report = convert_directory(
         args.directory,
+        mode=args.mode,
         output_dir=args.output_dir,
         dry_run=args.dry_run,
     )

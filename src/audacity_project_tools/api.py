@@ -5,13 +5,17 @@ import logging
 from .converter import ProjectConverter
 from .scanner   import ProjectScanner
 from .session   import AudacitySession
-from .models    import ConversionDecision, ConversionFailure, ConversionReport
+from .models    import ConversionDecision, ConversionFailure, ConversionMode, ConversionReport
 from .validator import should_convert
 
 logger = logging.getLogger(__name__)
 
 
-def convert(source: Path, destination: Path) -> None:
+def convert(
+        source: Path,
+        destination: Path,
+        mode: ConversionMode,
+) -> None:
     """Convert an Audacity project."""
 
     logger.debug("Conversion de %s", source)
@@ -21,7 +25,7 @@ def convert(source: Path, destination: Path) -> None:
         client = session.start()
 
         converter = ProjectConverter(client)
-        converter.convert(source, destination)
+        converter.convert(source, destination, mode)
 
     finally:
         session.close()
@@ -30,13 +34,19 @@ def convert(source: Path, destination: Path) -> None:
 
 def convert_directory(
     root: Path,
+    mode: ConversionMode,
     output_dir: Path | None = None,
     dry_run: bool = False,
 ) -> ConversionReport:
     """Convert all Audacity projects found in a directory."""
 
     scanner = ProjectScanner()
-    projects = scanner.scan(root)
+    if mode == ConversionMode.AUP_TO_AUP3:
+        pattern = "*.aup"
+    else:
+        pattern = "*.aup3"
+
+    projects = scanner.scan(root, pattern)
 
     count = 0
     converted = 0
@@ -45,6 +55,11 @@ def convert_directory(
     failures: list[ConversionFailure] = []
 
     for source in projects:
+        if mode == ConversionMode.AUP3_TO_AUP3 and output_dir is None:
+            raise ValueError(
+                "output_dir is required for AUP3_TO_AUP3 conversion"
+            )
+
         relative = source.relative_to(root)
 
         if output_dir is None:
@@ -52,7 +67,7 @@ def convert_directory(
         else:
             destination = output_dir / relative.with_suffix(".aup3")
 
-        validation = should_convert(source, destination)
+        validation = should_convert(source, destination, mode)
 
         count += 1
 
@@ -72,7 +87,7 @@ def convert_directory(
                 try:
                     client = session.start()
                     converter = ProjectConverter(client)
-                    converter.convert(source, destination)
+                    converter.convert(source, destination, mode)
 
                 except Exception as exc:
                     logger.exception("Conversion failed for %s", source)

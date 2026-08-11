@@ -4,6 +4,8 @@ from pathlib import Path
 
 import argparse
 
+from .models import ConversionMode
+
 
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     """Parse command-line arguments."""
@@ -33,4 +35,25 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         help="Directory where converted projects are written.",
     )
 
+    parser.add_argument(
+        "--mode",
+        type=ConversionMode,
+        choices=list(ConversionMode),
+        default=ConversionMode.AUP_TO_AUP3,
+        metavar="{aup-to-aup3,aup3-to-aup3}",
+        help="Conversion mode.",
+    )
+
     return parser.parse_args(argv)
+
+
+def validate_args(args: argparse.Namespace) -> None:
+    """Validate command-line arguments."""
+
+    if (
+        args.mode == ConversionMode.AUP3_TO_AUP3
+        and args.output_dir is None
+    ):
+        raise ValueError(
+            "--output-dir is required with --mode aup3-to-aup3"
+        )

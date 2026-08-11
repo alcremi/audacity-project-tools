@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from audacity_project_tools.models    import ConversionDecision, ValidationResult
+from audacity_project_tools.models    import ConversionDecision, ValidationResult, ConversionMode
 from audacity_project_tools.validator import should_convert
 
-ALREADY_CONVERTED = "Project already converted."
+ALREADY_CONVERTED = "Already converted."
 MISSING_DATA = "Missing data directory"
 
 def test_should_convert_returns_convert(tmp_path: Path) -> None:
@@ -13,7 +13,7 @@ def test_should_convert_returns_convert(tmp_path: Path) -> None:
     data_dir = tmp_path / "project_data"
     data_dir.mkdir()
 
-    result = should_convert(source, destination)
+    result = should_convert(source, destination, ConversionMode.AUP_TO_AUP3)
 
     assert result.decision == ConversionDecision.CONVERT
 
@@ -28,7 +28,7 @@ def test_should_convert_returns_skip_if_destination_exists(
 
     destination.touch()
 
-    result = should_convert(source, destination)
+    result = should_convert(source, destination, ConversionMode.AUP_TO_AUP3)
 
     assert result.decision == ConversionDecision.SKIP_ALREADY_CONVERTED
 
@@ -39,7 +39,7 @@ def test_should_convert_returns_fail_if_data_missing(
     source = tmp_path / "project.aup"
     destination = tmp_path / "project.aup3"
 
-    result = should_convert(source, destination)
+    result = should_convert(source, destination, ConversionMode.AUP_TO_AUP3)
 
     assert result.decision == ConversionDecision.FAIL_MISSING_DATA
 
@@ -50,7 +50,7 @@ def test_should_convert_reports_missing_data(
     source = tmp_path / "project.aup"
     destination = tmp_path / "project.aup3"
 
-    result = should_convert(source, destination)
+    result = should_convert(source, destination, ConversionMode.AUP_TO_AUP3)
 
     assert result.message == "Missing data directory: project_data"
 
@@ -69,6 +69,59 @@ def test_should_convert_uses_destination_path(
 
     destination.touch()
 
-    result = should_convert(source, destination)
+    result = should_convert(source, destination, ConversionMode.AUP_TO_AUP3)
 
     assert result.decision == ConversionDecision.SKIP_ALREADY_CONVERTED
+
+
+def test_should_convert_aup3_returns_convert(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "project.aup3"
+    destination = tmp_path / "converted" / "project.aup3"
+
+    source.touch()
+
+    result = should_convert(
+        source,
+        destination,
+        ConversionMode.AUP3_TO_AUP3,
+    )
+
+    assert result.decision == ConversionDecision.CONVERT
+
+
+def test_should_convert_aup3_skips_existing_destination(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "project.aup3"
+    destination = tmp_path / "converted" / "project.aup3"
+
+    source.touch()
+    destination.parent.mkdir()
+    destination.touch()
+
+    result = should_convert(
+        source,
+        destination,
+        ConversionMode.AUP3_TO_AUP3,
+    )
+
+    assert result.decision == ConversionDecision.SKIP_ALREADY_CONVERTED
+
+
+def test_should_convert_aup3_does_not_require_data_directory(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "project.aup3"
+    destination = tmp_path / "converted" / "project.aup3"
+
+    source.touch()
+
+    result = should_convert(
+        source,
+        destination,
+        ConversionMode.AUP3_TO_AUP3,
+    )
+
+    assert result.decision == ConversionDecision.CONVERT

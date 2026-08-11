@@ -1,7 +1,11 @@
 ## [0.1.0] - 2026-07-14
 
-
 0001  Initial project structure
+	- Initial GitHub repository
+	- Project skeleton
+	- Initial documentation
+	- Coding conventions
+	- Architecture roadmap
 0002  Add package infrastructure
 0003  Add exceptions
 0004  Add Audacity pipe
@@ -59,12 +63,4 @@
 	- Add success and failure unit tests
 0046  Extract conversion report formatting
 0047  Add output directory support
-
-
-### Added
-
-- Initial GitHub repository
-- Project skeleton
-- Initial documentation
-- Coding conventions
-- Architecture roadmap
+0048  Add AUP3 to AUP3 conversion via temporary copy

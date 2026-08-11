@@ -4,7 +4,7 @@ import pytest
 
 from audacity_project_tools.api import convert_directory, format_report
 import audacity_project_tools.api as api
-from audacity_project_tools.models import (ConversionDecision, ValidationResult, ConversionReport, ConversionFailure)
+from audacity_project_tools.models import (ConversionDecision, ValidationResult, ConversionReport, ConversionFailure, ConversionMode)
 
 
 def test_format_report_with_failure(tmp_path: Path) -> None:
@@ -50,12 +50,19 @@ def fake_should_convert(source: Path) -> ValidationResult:
 
 class FakeScanner:
 
-    def scan(self, root: Path):
-        for name in ("A.aup", "B.aup", "C.aup"):
-            source = root / name
-            (root / f"{source.stem}_data").mkdir()
-            yield source
+    def scan(self, root: Path, pattern: str = "*.aup"):
+        if pattern == "*.aup":
+            names = ("A.aup", "B.aup", "C.aup")
+        else:
+            names = ("A.aup3", "B.aup3", "C.aup3")
 
+        for name in names:
+            source = root / name
+
+            if source.suffix == ".aup":
+                (root / f"{source.stem}_data").mkdir()
+
+            yield source
 
 class FakeSession:
 
@@ -72,18 +79,21 @@ class FakeSession:
 class FakeConverter:
 
     calls: list[tuple[Path, Path]] = []
+    modes: list[ConversionMode] = []
 
     def __init__(self, client):
         pass
 
     def convert(
-        self,
-        source: Path,
-        destination: Path,
+            self,
+            source: Path,
+            destination: Path,
+            mode: ConversionMode,
     ) -> None:
         self.calls.append((source, destination))
+        self.modes.append(mode)
 
-        if source.name == "B.aup":
+        if source.stem == "B":
             raise RuntimeError("Conversion failed")
 
 
@@ -97,7 +107,7 @@ def test_convert_directory_uses_source_directory_by_default(
     monkeypatch.setattr(api, "AudacitySession", FakeSession)
     monkeypatch.setattr(api, "ProjectConverter", FakeConverter)
 
-    report = convert_directory(tmp_path)
+    report = convert_directory(tmp_path, ConversionMode.AUP_TO_AUP3)
 
     assert report.count == 3
     assert report.converted == 2
@@ -133,6 +143,7 @@ def test_convert_directory_uses_output_directory(
 
     report = convert_directory(
         tmp_path,
+        ConversionMode.AUP_TO_AUP3,
         output_dir=output_dir,
     )
 
@@ -171,6 +182,7 @@ def test_convert_directory_dry_run_uses_output_directory(
 
     report = convert_directory(
         tmp_path,
+        ConversionMode.AUP_TO_AUP3,
         output_dir=output_dir,
         dry_run=True,
     )
@@ -197,4 +209,149 @@ def test_convert_directory_dry_run_uses_output_directory(
     assert (
         f"{tmp_path / 'C.aup'} -> "
         f"{output_dir / 'C.aup3'}"
+    ) in captured.out
+
+
+def test_convert_directory_aup3_to_aup3(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    FakeConverter.calls.clear()
+    FakeConverter.modes.clear()
+
+    monkeypatch.setattr(api, "ProjectScanner", FakeScanner)
+    monkeypatch.setattr(api, "AudacitySession", FakeSession)
+    monkeypatch.setattr(api, "ProjectConverter", FakeConverter)
+
+    output_dir = tmp_path / "converted"
+
+    report = convert_directory(
+        tmp_path,
+        ConversionMode.AUP3_TO_AUP3,
+        output_dir=output_dir,
+    )
+
+    assert report.count == 3
+    assert report.converted == 2
+    assert report.skipped == 0
+    assert report.failed == 1
+
+    assert FakeConverter.calls == [
+        (
+            tmp_path / "A.aup3",
+            output_dir / "A.aup3",
+        ),
+        (
+            tmp_path / "B.aup3",
+            output_dir / "B.aup3",
+        ),
+        (
+            tmp_path / "C.aup3",
+            output_dir / "C.aup3",
+        ),
+    ]
+
+    assert FakeConverter.modes == [
+        ConversionMode.AUP3_TO_AUP3,
+        ConversionMode.AUP3_TO_AUP3,
+        ConversionMode.AUP3_TO_AUP3,
+    ]
+
+
+class FakeScannerNested:
+
+    def scan(self, root: Path, pattern: str = "*.aup"):
+        source = root / "Audio" / "A.aup3"
+        source.parent.mkdir(parents=True)
+        yield source
+
+
+def test_convert_directory_preserves_subdirectories(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    FakeConverter.calls.clear()
+
+    monkeypatch.setattr(
+        api,
+        "ProjectScanner",
+        FakeScannerNested,
+    )
+    monkeypatch.setattr(
+        api,
+        "AudacitySession",
+        FakeSession,
+    )
+    monkeypatch.setattr(
+        api,
+        "ProjectConverter",
+        FakeConverter,
+    )
+
+    output_dir = tmp_path / "converted"
+
+    report = convert_directory(
+        tmp_path,
+        ConversionMode.AUP3_TO_AUP3,
+        output_dir=output_dir,
+    )
+
+    assert report.count == 1
+    assert report.converted == 1
+    assert report.skipped == 0
+    assert report.failed == 0
+
+    assert FakeConverter.calls == [
+        (
+            tmp_path / "Audio" / "A.aup3",
+            output_dir / "Audio" / "A.aup3",
+        ),
+    ]
+
+
+def test_convert_directory_aup3_to_aup3_dry_run(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    FakeConverter.calls.clear()
+
+    monkeypatch.setattr(
+        api,
+        "ProjectScanner",
+        FakeScanner,
+    )
+    monkeypatch.setattr(
+        api,
+        "AudacitySession",
+        FakeSession,
+    )
+    monkeypatch.setattr(
+        api,
+        "ProjectConverter",
+        FakeConverter,
+    )
+
+    output_dir = tmp_path / "converted"
+
+    report = convert_directory(
+        tmp_path,
+        ConversionMode.AUP3_TO_AUP3,
+        output_dir=output_dir,
+        dry_run=True,
+    )
+
+    assert report.count == 3
+    assert report.converted == 0
+    assert report.skipped == 0
+    assert report.failed == 0
+
+    assert FakeConverter.calls == []
+    assert not output_dir.exists()
+
+    captured = capsys.readouterr()
+
+    assert (
+        f"{tmp_path / 'A.aup3'} -> "
+        f"{output_dir / 'A.aup3'}"
     ) in captured.out

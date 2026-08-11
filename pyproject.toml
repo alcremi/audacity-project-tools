@@ -7,7 +7,7 @@ build-backend = "setuptools.build_meta"
 name = "audacity-project-tools"
 version = "0.1.0"
 description = "Tools for migrating and managing Audacity projects"
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 authors = [
     {name = "Alcremi"}
 ]

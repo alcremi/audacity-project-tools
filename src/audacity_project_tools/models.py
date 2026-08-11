@@ -43,3 +43,7 @@ class ConversionReport:
     skipped: int = 0
     failed: int = 0
     failures: list[ConversionFailure] = field(default_factory=list)
+
+class ConversionMode(Enum):
+    AUP_TO_AUP3 = "aup-to-aup3"
+    AUP3_TO_AUP3 = "aup3-to-aup3"

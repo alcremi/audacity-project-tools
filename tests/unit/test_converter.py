@@ -2,11 +2,11 @@ from pathlib import Path
 
 import pytest
 
-from audacity_project_tools.exceptions import ConversionError
-from test_pipe              import FakePipe3
-from audacity_project_tools import AudacityClient
-from audacity_project_tools import ProjectConverter
-from audacity_project_tools import ConversionMode
+from audacity_project_tools.exceptions import ConversionError, PipeTimeoutError
+from test_pipe                         import FakePipe3
+from audacity_project_tools            import AudacityClient
+from audacity_project_tools            import ProjectConverter
+from audacity_project_tools            import ConversionMode
 
 
 def test_converter_creation() -> None:
@@ -88,7 +88,11 @@ def test_convert_aup3_to_aup3_uses_temporary_copy(
         loaded_content: bytes | None = None
         saved_path: Path | None = None
 
-        def load_project(self, path: Path):
+        def load_project(
+            self,
+            path: Path,
+            timeout: float | None = None,
+        ):
             self.loaded_path = path
             self.loaded_content = path.read_bytes()
             return object()
@@ -115,3 +119,96 @@ def test_convert_aup3_to_aup3_uses_temporary_copy(
     assert destination.exists()
 
     assert source.read_bytes() == b"original project"
+
+
+def test_convert_aup3_to_aup3_cleans_temporary_file_on_timeout(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "project.aup3"
+    destination = tmp_path / "output.aup3"
+
+    source.write_bytes(b"original project")
+
+    class FakeClient:
+        def load_project(
+            self,
+            path: Path,
+            timeout: float | None = None,
+        ):
+            assert path == (
+                tmp_path / ".project.conversion.aup3"
+            )
+            assert timeout == 0.1
+            raise PipeTimeoutError(
+                "Timeout waiting for Audacity response."
+            )
+
+        def save_project(self, path: Path) -> None:
+            raise AssertionError(
+                "save_project() should not be called"
+            )
+
+    converter = ProjectConverter(
+        FakeClient(),
+        load_timeout=0.1,
+    )
+
+    with pytest.raises(PipeTimeoutError):
+        converter.convert(
+            source,
+            destination,
+            ConversionMode.AUP3_TO_AUP3,
+        )
+
+    assert source.read_bytes() == b"original project"
+    assert not destination.exists()
+    assert not (
+        tmp_path / ".project.conversion.aup3"
+    ).exists()
+
+
+def test_convert_aup3_to_aup3_cleans_temporary_file_on_timeout(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "project.aup3"
+    destination = tmp_path / "output.aup3"
+
+    source.write_bytes(b"original project")
+
+    class FakeClient:
+        def load_project(
+            self,
+            path: Path,
+            timeout: float | None = None,
+        ):
+            assert path == (
+                tmp_path / ".project.conversion.aup3"
+            )
+            assert timeout == 0.1
+
+            raise PipeTimeoutError(
+                "Timeout waiting for Audacity response."
+            )
+
+        def save_project(self, path: Path) -> None:
+            raise AssertionError(
+                "save_project() should not be called"
+            )
+
+    converter = ProjectConverter(
+        FakeClient(),
+        load_timeout=0.1,
+    )
+
+    with pytest.raises(PipeTimeoutError):
+        converter.convert(
+            source,
+            destination,
+            ConversionMode.AUP3_TO_AUP3,
+        )
+
+    assert source.read_bytes() == b"original project"
+    assert not destination.exists()
+    assert not (
+        tmp_path / ".project.conversion.aup3"
+    ).exists()

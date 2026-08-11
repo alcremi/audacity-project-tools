@@ -64,3 +64,4 @@
 0046  Extract conversion report formatting
 0047  Add output directory support
 0048  Add AUP3 to AUP3 conversion via temporary copy
+0049  Add timeout handling for Audacity pipe and AUP3 conversion

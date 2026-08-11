@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import os
 import logging
+import select
+import time
 from pathlib import Path
 from typing  import TextIO
 
-from .exceptions import PipeConnectionError
+from .exceptions import PipeConnectionError, PipeTimeoutError
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +40,11 @@ class AudacityPipe:
                 "Audacity pipes are not available."
             )
 
-    def send(self, command: str) -> str:
+    def send(
+        self,
+        command: str,
+        timeout: float | None = None,
+    ) -> str:
         """Send a command and return Audacity response."""
 
         logger.debug(">>> %s", command)
@@ -51,25 +57,56 @@ class AudacityPipe:
             writer.write("\n")
             writer.flush()
 
-        lines: list[str] = []
+            lines: list[str] = []
 
-        with self._from_pipe.open("r") as reader:
-            while True:
-                line = reader.readline()
+            deadline = None
+            if timeout is not None:
+                deadline = time.monotonic() + timeout
 
-                if not line:
-                    break
+            with self._from_pipe.open("r") as reader:
+                while True:
+                    if deadline is None:
+                        ready, _, _ = select.select(
+                            [reader],
+                            [],
+                            [],
+                            None,
+                        )
+                    else:
+                        remaining = deadline - time.monotonic()
 
-                lines.append(line)
+                        if remaining <= 0:
+                            raise PipeTimeoutError(
+                                f"Timeout waiting for response to: {command}"
+                            )
 
-                if line.startswith("BatchCommand finished:"):
-                    break
+                        ready, _, _ = select.select(
+                            [reader],
+                            [],
+                            [],
+                            remaining,
+                        )
 
-        response = "".join(lines)
+                    if not ready:
+                        raise PipeTimeoutError(
+                            f"Timeout waiting for response to: {command}"
+                        )
 
-        logger.debug("<<< %s", response.rstrip())
+                    line = reader.readline()
 
-        return response
+                    if not line:
+                        break
+
+                    lines.append(line)
+
+                    if line.startswith("BatchCommand finished:"):
+                        break
+
+            response = "".join(lines)
+
+            logger.debug("<<< %s", response.rstrip())
+
+            return response
 
     def send_once(self, command: str) -> None:
         """Send one command using a temporary FIFO connection."""

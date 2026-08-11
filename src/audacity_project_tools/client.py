@@ -23,10 +23,17 @@ class AudacityClient:
 
         return response
 
-    def _execute(self, command: str) -> str:
+    def _execute(
+        self,
+        command: str,
+        timeout: float | None = None,
+    ) -> str:
         """Execute an Audacity command and return its response."""
 
-        response = self._pipe.send(command)
+        response = self._pipe.send(
+            command,
+            timeout=timeout,
+        )
 
         if "BatchCommand finished: Failed!" in response:
             raise AudacityCommandError(response)
@@ -61,7 +68,11 @@ class AudacityClient:
             "Timed out while waiting for the project to load."
         )
 
-    def open_project(self, project_path: Path) -> None:
+    def open_project(
+        self,
+        project_path: Path,
+        timeout: float | None = None,
+    ) -> None:
         command = f'OpenProject2: Filename="{project_path}"'
         self._pipe.send(command)
         self._wait_until_project_loaded()

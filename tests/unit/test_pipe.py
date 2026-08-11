@@ -1,6 +1,11 @@
 from pathlib import Path
+import time
+import pytest
+import os
+import threading
 
-from audacity_project_tools.pipe import AudacityPipe, PIPE_TO, PIPE_FROM
+from audacity_project_tools.exceptions import PipeTimeoutError
+from audacity_project_tools.pipe       import AudacityPipe, PIPE_TO, PIPE_FROM
 
 
 class FakePipe:
@@ -11,7 +16,11 @@ class FakePipe:
         self.command = command
         return "BatchCommand finished: OK"
 
-    def send(self, command: str) -> str:
+    def send(
+        self,
+        command: str,
+        timeout: float | None = None,
+    ) -> str:
         if str == "Help:":
             self.command = "Help:"
             return self._sendHelp(command)
@@ -37,7 +46,11 @@ class FakePipe3:
         self.command = command
         return "BatchCommand finished: OK"
 
-    def send(self, command: str) -> str:
+    def send(
+        self,
+        command: str,
+        timeout: float | None = None,
+    ) -> str:
         self.command = command
         self.commands.append(command)
         if command == "Help:":
@@ -78,7 +91,11 @@ BatchCommand finished: OK
 """,
         ])
 
-    def send(self, command: str) -> str:
+    def send(
+        self,
+        command: str,
+        timeout: float | None = None,
+    ) -> str:
         self.commands.append(command)
 
         if command.startswith("Help:"):
@@ -109,3 +126,37 @@ def test_default_pipe() -> None:
 
     assert pipe._to_pipe == PIPE_TO
     assert pipe._from_pipe == PIPE_FROM
+
+
+def test_send_times_out_when_audacity_does_not_respond(
+    tmp_path: Path,
+) -> None:
+    to_pipe = tmp_path / "to"
+    from_pipe = tmp_path / "from"
+
+    os.mkfifo(to_pipe)
+    os.mkfifo(from_pipe)
+
+    pipe = AudacityPipe(
+        to_pipe,
+        from_pipe,
+    )
+
+    def fake_audacity() -> None:
+        with to_pipe.open("r") as reader:
+            reader.readline()
+
+        with from_pipe.open("w") as writer:
+            time.sleep(1)
+
+    thread = threading.Thread(
+        target=fake_audacity,
+        daemon=True,
+    )
+    thread.start()
+
+    with pytest.raises(PipeTimeoutError):
+        pipe.send(
+            "GetInfo: Type=Tracks",
+            timeout=0.1,
+        )

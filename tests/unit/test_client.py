@@ -1,8 +1,11 @@
 from pathlib import Path
+import time
+import pytest
 
-from audacity_project_tools import AudacityPipe
-from audacity_project_tools import AudacityClient
-from test_pipe              import FakePipe3, FakePipe4
+from audacity_project_tools            import AudacityPipe
+from audacity_project_tools            import AudacityClient
+from test_pipe                         import FakePipe3, FakePipe4
+from audacity_project_tools.exceptions import PipeTimeoutError
 
 
 def test_client() -> None:
@@ -17,7 +20,11 @@ class FakePipe:
     def __init__(self) -> None:
         self.command = ""
 
-    def send(self, command: str) -> str:
+    def send(
+        self,
+        command: str,
+        timeout: float | None = None,
+    ) -> str:
         self.command = command
         return "BatchCommand finished: OK"
 
@@ -35,7 +42,11 @@ class FakePipe2:
     def __init__(self) -> None:
         self.command = ""
 
-    def send(self, command: str) -> str:
+    def send(
+        self,
+        command: str,
+        timeout: float | None = None,
+    ) -> str:
         self.command = command
         return """
 [
@@ -106,3 +117,30 @@ def test_load_project() -> None:
     assert project.path == Path("/tmp/test.aup")
     assert len(project.tracks) == 1
     assert project.tracks[0].name == "Voice"
+
+
+class BlockingPipe:
+    def send(self, command: str) -> str:
+        if command == "GetInfo: Type=Tracks":
+            time.sleep(10)
+        return ""
+
+class TimeoutPipe:
+    def send(
+        self,
+        command: str,
+        timeout: float | None = None,
+    ) -> str:
+        raise PipeTimeoutError(
+            "Timeout waiting for Audacity response."
+        )
+
+def test_open_project_propagates_pipe_timeout() -> None:
+    pipe = TimeoutPipe()
+    client = AudacityClient(pipe)
+
+    with pytest.raises(PipeTimeoutError):
+        client.open_project(
+            Path("/tmp/test.aup3"),
+            timeout=0.1,
+        )

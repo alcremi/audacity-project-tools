@@ -18,9 +18,11 @@ class ProjectConverter:
             self,
             client,
             save_timeout: float = 5.0,
+            load_timeout: float = 10.0,
     ):
         self._client = client
         self._save_timeout = save_timeout
+        self._load_timeout = load_timeout
 
     def _wait_for_saved_project(
             self,
@@ -51,7 +53,7 @@ class ProjectConverter:
         try:
             shutil.copy2(source, temporary)
 
-            self._client.load_project(temporary)
+            self._client.load_project(temporary, timeout=self._load_timeout)
             self._client.save_project(destination)
 
             self._wait_for_saved_project(destination)

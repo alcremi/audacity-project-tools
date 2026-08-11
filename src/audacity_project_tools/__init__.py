@@ -1,5 +1,5 @@
 from .client     import AudacityClient
-from .exceptions import AudacityCommandError, PipeConnectionError, AudacityProcessError, ConversionError
+from .exceptions import AudacityCommandError, PipeConnectionError, PipeTimeoutError, AudacityProcessError, ConversionError
 from .pipe       import AudacityPipe
 from .models     import Track, Project, ConversionDecision, ValidationResult, ConversionFailure, ConversionMode, ConversionReport
 from .converter  import ProjectConverter
@@ -23,6 +23,7 @@ __all__ = [
     "ConversionMode",
     "ConversionReport",
     "PipeConnectionError",
+    "PipeTimeoutError",
     "Project",
     "ProjectConverter",
     "ProjectScanner",

@@ -7,6 +7,9 @@ class AudacityError(Exception):
 class PipeConnectionError(AudacityError):
     """Raised when the connection to Audacity pipes fails."""
 
+class PipeTimeoutError(AudacityError):
+    """Raised when Audacity does not respond within the timeout."""
+
 class DirectoryNotFoundError(AudacityError):
     """Raised when the root directory does not exist."""
     def __init__(self, directory: Path) -> None:

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import time
 
-from .client  import AudacityClient
-from .pipe    import AudacityPipe
-from .process import AudacityProcess
+from .client     import AudacityClient
+from .pipe       import AudacityPipe
+from .process    import AudacityProcess
+from .exceptions import PipeTimeoutError
 
 
 class AudacitySession:
@@ -34,6 +35,12 @@ class AudacitySession:
         return self._client
 
     def close(self) -> None:
-        if self._client is not None:
+        if self._client is None:
+            return
+
+        try:
             self._client.exit_audacity()
+        except PipeTimeoutError:
+            pass
+        finally:
             self._process.wait_for_exit()

@@ -48,17 +48,20 @@ class AudacityProcess:
     def wait_until_ready(self) -> None:
         """Wait until Audacity scripting pipe is available."""
 
-
         timeout = 30.0
         deadline = time.monotonic() + timeout
 
         while time.monotonic() < deadline:
+            if self._process is not None and self._process.poll() is not None:
+                raise AudacityProcessError(
+                    "Audacity exited before scripting pipes became available."
+                )
+
             if self._pipe_to.exists() and self._pipe_from.exists():
                 return
 
             time.sleep(0.1)
 
-        print("Sortie de boucle")
         raise AudacityProcessError(
             "Timed out while waiting for Audacity pipes."
         )

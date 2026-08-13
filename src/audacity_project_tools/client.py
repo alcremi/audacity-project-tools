@@ -45,8 +45,11 @@ class AudacityClient:
 
         return self._execute("Help:")
 
-    def get_tracks(self) -> list[Track]:
-        response = self._execute("GetInfo: Type=Tracks")
+    def get_tracks(
+        self,
+        timeout: float | None = None,
+    ) -> list[Track]:
+        response = self._execute("GetInfo: Type=Tracks", timeout)
 
         return parse_tracks(response)
 
@@ -84,12 +87,24 @@ class AudacityClient:
     def exit_audacity(self) -> None:
         """Close the project (which must have been saved before) and close the Audacity instance."""
 
-        self._pipe.send("Exit:")
+        self._pipe.send(
+            "Exit:",
+            timeout=2.0,
+        )
 
-    def load_project(self, path: Path) -> Project:
-        self.open_project(path)
+    def load_project(
+        self,
+        path: Path,
+        timeout: float | None = None,
+    ) -> Project:
+        self.open_project(
+            path,
+            timeout=timeout,
+        )
 
-        tracks = self.get_tracks()
+        tracks = self.get_tracks(
+            timeout=timeout,
+        )
 
         return Project(
             path=path,

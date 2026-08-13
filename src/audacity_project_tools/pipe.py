@@ -57,35 +57,33 @@ class AudacityPipe:
             writer.write("\n")
             writer.flush()
 
-            lines: list[str] = []
+        lines: list[str] = []
 
-            deadline = None
-            if timeout is not None:
-                deadline = time.monotonic() + timeout
+        deadline: float | None = None
+        if timeout is not None:
+            deadline = time.monotonic() + timeout
 
-            with self._from_pipe.open("r") as reader:
-                while True:
-                    if deadline is None:
-                        ready, _, _ = select.select(
-                            [reader],
-                            [],
-                            [],
-                            None,
+        with self._from_pipe.open("r") as reader:
+            while True:
+                if timeout is None:
+                    line = reader.readline()
+
+                else:
+                    assert deadline is not None
+
+                    remaining = deadline - time.monotonic()
+
+                    if remaining <= 0:
+                        raise PipeTimeoutError(
+                            f"Timeout waiting for response to: {command}"
                         )
-                    else:
-                        remaining = deadline - time.monotonic()
 
-                        if remaining <= 0:
-                            raise PipeTimeoutError(
-                                f"Timeout waiting for response to: {command}"
-                            )
-
-                        ready, _, _ = select.select(
-                            [reader],
-                            [],
-                            [],
-                            remaining,
-                        )
+                    ready, _, _ = select.select(
+                        [reader],
+                        [],
+                        [],
+                        remaining,
+                    )
 
                     if not ready:
                         raise PipeTimeoutError(
@@ -94,30 +92,22 @@ class AudacityPipe:
 
                     line = reader.readline()
 
-                    if not line:
-                        break
+                if not line:
+                    break
 
-                    lines.append(line)
+                lines.append(line)
 
-                    if line.startswith("BatchCommand finished:"):
-                        break
+                if line.startswith("BatchCommand finished:"):
+                    break
 
-            response = "".join(lines)
+        response = "".join(lines)
 
-            logger.debug("<<< %s", response.rstrip())
+        logger.debug("<<< %s", response.rstrip())
 
-            return response
+        return response
 
     def send_once(self, command: str) -> None:
         """Send one command using a temporary FIFO connection."""
-
-        with self._to_pipe.open("w") as writer:
-            writer.write(command)
-            writer.write("\n")
-            writer.flush()
-
-    def send_no_response_test1(self, command: str) -> None:
-        """Send a command and do not wait for a response."""
 
         with self._to_pipe.open("w") as writer:
             writer.write(command)

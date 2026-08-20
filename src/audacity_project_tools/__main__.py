@@ -7,14 +7,15 @@ from .cli        import parse_args, validate_args
 from .exceptions import PipeConnectionError
 
 
-logging.basicConfig(
-    filename="audacity-project-tools.log",
-    level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s",
-)
-
 def run() -> int:
     args = parse_args()
+
+    logging.basicConfig(
+        filename="audacity-project-tools.log",
+        level=logging.DEBUG if args.debug else logging.INFO,
+        format="%(asctime)s %(levelname)s %(message)s",
+    )
+
     validate_args(args)
 
     if not args.directory.is_dir():

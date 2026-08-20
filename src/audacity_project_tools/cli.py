@@ -30,6 +30,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
 
     parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug logging.",
+    )
+
+    parser.add_argument(
         "--output-dir",
         type=Path,
         help="Directory where converted projects are written.",

@@ -131,3 +131,20 @@ def test_validate_args_accepts_aup_to_aup3_without_output_dir() -> None:
     )
 
     validate_args(args)
+
+
+def test_debug() -> None:
+    args = parse_args([
+        "--debug",
+        "/tmp",
+    ])
+
+    assert args.debug is True
+
+
+def test_no_debug() -> None:
+    args = parse_args([
+        "/tmp",
+    ])
+
+    assert args.debug is False

@@ -16,6 +16,7 @@ def test_run_returns_error_for_missing_directory(
         mode = None
         output_dir = None
         dry_run = False
+        debug = False
 
     monkeypatch.setattr(
         main_module,
@@ -50,6 +51,7 @@ def test_run_converts_directory_and_writes_report(
         mode = ConversionMode.AUP_TO_AUP3
         output_dir = tmp_path / "converted"
         dry_run = False
+        debug = False
 
     report = ConversionReport(
         count=2,

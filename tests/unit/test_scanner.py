@@ -80,3 +80,19 @@ def test_scan_finds_projects_in_subdirectories(
     result = list(scanner.scan(tmp_path, "*.aup3"))
 
     assert result == [project]
+
+
+def test_scan_ignores_directories_matching_pattern(
+    tmp_path: Path,
+) -> None:
+    project_directory = tmp_path / "fake.aup"
+    project_directory.mkdir()
+
+    project = tmp_path / "real.aup"
+    project.touch()
+
+    scanner = ProjectScanner()
+
+    assert list(scanner.scan(tmp_path)) == [
+        project,
+    ]

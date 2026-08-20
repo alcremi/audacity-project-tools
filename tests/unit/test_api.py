@@ -355,3 +355,47 @@ def test_convert_directory_aup3_to_aup3_dry_run(
         f"{tmp_path / 'A.aup3'} -> "
         f"{output_dir / 'A.aup3'}"
     ) in captured.out
+
+
+def test_convert_directory_closes_session_after_conversion_failure(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    FakeConverter.calls.clear()
+    FakeConverter.modes.clear()
+
+    sessions: list[FakeSession] = []
+
+    class TrackingSession(FakeSession):
+        def __init__(self) -> None:
+            super().__init__()
+            sessions.append(self)
+
+    monkeypatch.setattr(
+        api,
+        "ProjectScanner",
+        FakeScanner,
+    )
+    monkeypatch.setattr(
+        api,
+        "AudacitySession",
+        TrackingSession,
+    )
+    monkeypatch.setattr(
+        api,
+        "ProjectConverter",
+        FakeConverter,
+    )
+
+    report = convert_directory(
+        tmp_path,
+        ConversionMode.AUP_TO_AUP3,
+    )
+
+    assert report.count == 3
+    assert report.converted == 2
+    assert report.skipped == 0
+    assert report.failed == 1
+
+    assert len(sessions) == 3
+    assert all(session.closed for session in sessions)

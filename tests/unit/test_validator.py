@@ -125,3 +125,22 @@ def test_should_convert_aup3_does_not_require_data_directory(
     )
 
     assert result.decision == ConversionDecision.CONVERT
+
+
+def test_should_convert_returns_fail_if_data_path_is_file(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "project.aup"
+    destination = tmp_path / "project.aup3"
+
+    data_path = tmp_path / "project_data"
+    data_path.touch()
+
+    result = should_convert(
+        source,
+        destination,
+        ConversionMode.AUP_TO_AUP3,
+    )
+
+    assert result.decision == ConversionDecision.FAIL_MISSING_DATA
+    assert result.message == "Missing data directory: project_data"

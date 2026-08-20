@@ -9,6 +9,8 @@ from .pipe       import AudacityPipe
 
 logger = logging.getLogger(__name__)
 
+EXIT_TIMEOUT = 2.0
+
 class AudacityClient:
     """High-level interface to Audacity scripting commands."""
 
@@ -89,7 +91,7 @@ class AudacityClient:
 
         self._pipe.send(
             "Exit:",
-            timeout=2.0,
+            timeout=EXIT_TIMEOUT,
         )
 
     def load_project(

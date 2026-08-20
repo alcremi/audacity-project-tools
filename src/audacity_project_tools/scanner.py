@@ -13,4 +13,5 @@ class ProjectScanner:
         """Yield Audacity projects matching *pattern*."""
 
         for path in sorted(root.rglob(pattern)):
-            yield path
+            if path.is_file():
+                yield path

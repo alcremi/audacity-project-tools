@@ -66,3 +66,4 @@
 0048  Add AUP3 to AUP3 conversion via temporary copy
 0049  Add timeout handling for Audacity pipe and AUP3 conversion
 0050  Improve Audacity process and pipe handling
+0051  Fix conversion cleanup and project scanning

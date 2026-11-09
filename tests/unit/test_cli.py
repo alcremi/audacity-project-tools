@@ -148,3 +148,25 @@ def test_no_debug() -> None:
     ])
 
     assert args.debug is False
+
+
+def test_parse_check() -> None:
+    args = parse_args(["--check", "song.aup3"])
+
+    assert args.check == Path("song.aup3")
+    assert args.directory is None
+    validate_args(args)
+
+
+def test_validate_args_rejects_check_with_directory() -> None:
+    args = parse_args(["--check", "song.aup3", "/tmp"])
+
+    with pytest.raises(ValueError, match="--check cannot be combined"):
+        validate_args(args)
+
+
+def test_validate_args_requires_directory_without_check() -> None:
+    args = parse_args([])
+
+    with pytest.raises(ValueError, match="DIRECTORY is required"):
+        validate_args(args)

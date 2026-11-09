@@ -17,6 +17,7 @@ def test_run_returns_error_for_missing_directory(
         output_dir = None
         dry_run = False
         debug = False
+        check = None
 
     monkeypatch.setattr(
         main_module,
@@ -52,6 +53,7 @@ def test_run_converts_directory_and_writes_report(
         output_dir = tmp_path / "converted"
         dry_run = False
         debug = False
+        check = None
 
     report = ConversionReport(
         count=2,
@@ -151,3 +153,49 @@ def test_main_returns_error_if_audacity_is_not_running(
     assert captured.err == (
         "Error: Audacity is not running.\n"
     )
+
+
+def test_run_check_reports_corrupted_project(
+    tmp_path: Path,
+    monkeypatch,
+    capsys,
+) -> None:
+    project = tmp_path / "song.aup"
+    project.write_text("<broken", encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.argv", ["audacity-project-tools", "--check", str(project)])
+
+    result = main_module.run()
+
+    assert result == 1
+    assert f"CORRUPTED {project}" in capsys.readouterr().out
+
+
+def test_run_check_reports_valid_project(
+    tmp_path: Path,
+    monkeypatch,
+    capsys,
+) -> None:
+    project = tmp_path / "song.aup"
+    project.write_text('<project projname="song_data"/>', encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.argv", ["audacity-project-tools", "--check", str(project)])
+
+    result = main_module.run()
+
+    assert result == 0
+    assert f"OK        {project}" in capsys.readouterr().out
+
+
+def test_run_rejects_invalid_arguments(
+    tmp_path: Path,
+    monkeypatch,
+    capsys,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr("sys.argv", ["audacity-project-tools"])
+
+    result = main_module.run()
+
+    assert result == 2
+    assert "DIRECTORY is required" in capsys.readouterr().err

@@ -3,6 +3,7 @@ import logging
 from pathlib     import Path
 
 from .api        import convert_directory, format_report
+from .checker    import check_project, format_check_result
 from .cli        import parse_args, validate_args
 from .exceptions import PipeConnectionError
 
@@ -16,7 +17,16 @@ def run() -> int:
         format="%(asctime)s %(levelname)s %(message)s",
     )
 
-    validate_args(args)
+    try:
+        validate_args(args)
+    except ValueError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 2
+
+    if args.check is not None:
+        result = check_project(args.check)
+        print(format_check_result(result), end="")
+        return 0 if result.ok else 1
 
     if not args.directory.is_dir():
         print(

@@ -47,3 +47,14 @@ class ConversionReport:
 class ConversionMode(Enum):
     AUP_TO_AUP3 = "aup-to-aup3"
     AUP3_TO_AUP3 = "aup3-to-aup3"
+
+@dataclass(slots=True)
+class CheckResult:
+    """Outcome of an integrity check on one Audacity project."""
+
+    path: Path
+    problems: list[str] = field(default_factory=list)
+
+    @property
+    def ok(self) -> bool:
+        return not self.problems

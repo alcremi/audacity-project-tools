@@ -19,7 +19,15 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "directory",
         metavar="DIRECTORY",
         type=Path,
+        nargs="?",
         help="Directory containing Audacity projects.",
+    )
+
+    parser.add_argument(
+        "--check",
+        metavar="FILE",
+        type=Path,
+        help="Check an .aup or .aup3 project for corruption, then exit.",
     )
 
     # Optional arguments will be added here.
@@ -55,6 +63,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def validate_args(args: argparse.Namespace) -> None:
     """Validate command-line arguments."""
+
+    if args.check is not None:
+        if args.directory is not None:
+            raise ValueError("--check cannot be combined with DIRECTORY")
+        return
+
+    if args.directory is None:
+        raise ValueError("DIRECTORY is required unless --check is used")
 
     if (
         args.mode == ConversionMode.AUP3_TO_AUP3
